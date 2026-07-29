@@ -24,11 +24,13 @@ A full-stack MERN task management application featuring secure user authenticati
 ## Tech Stack
 
 **Frontend:** React, Context API, Vite
+
 **Backend:** Node.js, Express, MongoDB, Mongoose, JWT
 
 ## Project Structure
 
 **Frontend:** components, context, pages, App.jsx, main.jsx
+
 **Backend:** config, middleware, models, routes, server.js
 
 ## Installation
