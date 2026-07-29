@@ -1,30 +1,35 @@
-# To-Do Tasks App
+# To-Do List App
 
-A full-stack MERN application for managing personal tasks, with secure user accounts so each user's task list stays private to them.
+A full-stack MERN task management application featuring secure user authentication, private task storage, and an intuitive interface for managing daily tasks. This project demonstrates a complete MERN stack build with JWT authentication, protected API routes, and persistent data storage — each user has their own private task list.
 
-The app uses React on the front end and a Node/Express/MongoDB back end secured with JWT authentication.
+## Screenshots
 
-## Problem
-
-Task lists that anyone can view or edit aren't usable for personal or shared work — data needs to stay private to the account that owns it.
-
-## Impact
-
-Every task is scoped to an authenticated user via protected routes, so tasks stay private and secure without the user having to think about it.
+<table>
+  <tr>
+    <td><img src="screenshots/register.png" width="300" alt="Register page"/></td>
+    <td><img src="screenshots/dashboard.png" width="300" alt="Task dashboard"/></td>
+    <td><img src="screenshots/add-task.png" width="300" alt="Add task page"/></td>
+  </tr>
+</table>
 
 ## Features
 
-- User registration and login with hashed password validation
-- JWT-based authentication and protected routes
-- Create, edit, delete, and complete tasks
+- Secure user registration and login with hashed password validation
+- JWT authentication and protected API routes
+- Create, edit, complete, and delete tasks
 - Filter tasks by All / Active / Completed
 - Task counter showing tasks remaining
+- Responsive React interface
 
 ## Tech Stack
 
-**Front end:** React, Context API
-**Back end:** Node.js, Express, MongoDB, JWT
-**Structure:** Front end organized into components, context, and pages. Back end organized into config, middleware, models, and routes.
+**Frontend:** React, Context API, Vite
+**Backend:** Node.js, Express, MongoDB, Mongoose, JWT
+
+## Project Structure
+
+**Frontend:** components, context, pages, App.jsx, main.jsx
+**Backend:** config, middleware, models, routes, server.js
 
 ## Installation
 
@@ -34,30 +39,35 @@ Every task is scoped to an authenticated user via protected routes, so tasks sta
    git clone https://github.com/SZStanton/To-Do-Tasks
    ```
 
-2. Navigate into the project folder
-
-3. Install dependencies for both front end and back end
+2. Navigate into the project folder and install dependencies for both frontend and backend
 
    ```bash
    npm install
    ```
 
-4. Set up your environment variables (`.env`) with your MongoDB connection string and JWT secret
+3. Set up your environment variables (`.env`) with your MongoDB connection string and JWT secret
 
-5. Run the back end
+4. Run the backend
 
    ```bash
    npm run server
    ```
 
-6. Run the front end
+5. Run the frontend
 
    ```bash
    npm run dev
    ```
 
-7. Open the app in your browser
+6. Open the app in your browser
 
    ```bash
    http://localhost:5173/
    ```
+
+## Future Improvements
+
+- Task due dates and reminders
+- Task categories/tags
+- Drag-and-drop task reordering
+- Dark/light mode toggle
