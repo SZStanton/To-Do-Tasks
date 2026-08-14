@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import protect from '../middleware/auth.js';
 import jsonOnly from '../middleware/jsonOnly.js';
+import { registerSchema, loginSchema } from '../validation/authSchemas.js';
 
 const router = Router();
 
@@ -22,25 +23,19 @@ const cleanUser = user => ({
 // == REGISTER ==
 router.post('/register', jsonOnly, async (req, res) => {
   try {
-    const { name, email, username, password } = req.body;
+    const parsed = registerSchema.safeParse(req.body);
 
-    const cleanName = (name || '').trim();
-    const cleanEmail = (email || '').trim().toLowerCase();
-    const cleanUsername = (username || '').trim().toLowerCase();
-    const cleanPassword = (password || '').trim();
-
-    // Required fields check
-    if (!cleanName || !cleanEmail || !cleanUsername || !cleanPassword) {
-      return res.status(400).json({ message: 'All fields are required.' });
+    if (!parsed.success) {
+      return res.status(400).json({ message: parsed.error.issues[0].message });
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(cleanEmail)) {
-      return res.status(400).json({
-        message: 'Please enter a valid email address.',
-      });
-    }
+    // Zod has already trimmed and lowercased these
+    const {
+      name: cleanName,
+      email: cleanEmail,
+      username: cleanUsername,
+      password: cleanPassword,
+    } = parsed.data;
 
     // Check if user exists
     const exists = await User.findOne({
@@ -77,17 +72,16 @@ router.post('/register', jsonOnly, async (req, res) => {
 });
 
 // == LOGIN ==
-router.post('/login', async (req, res) => {
+router.post('/login', jsonOnly, async (req, res) => {
   try {
-    const { identifier, password } = req.body;
-    const cleanIdentifier = (identifier || '').trim().toLowerCase();
-    const cleanPassword = (password || '').trim();
+    const parsed = loginSchema.safeParse(req.body);
 
-    if (!cleanIdentifier || !cleanPassword) {
-      return res.status(400).json({
-        message: 'Username/email and password are required.',
-      });
+    if (!parsed.success) {
+      return res.status(400).json({ message: parsed.error.issues[0].message });
     }
+
+    const { identifier: cleanIdentifier, password: cleanPassword } =
+      parsed.data;
 
     const user = await User.findOne({
       $or: [{ email: cleanIdentifier }, { username: cleanIdentifier }],
@@ -100,7 +94,7 @@ router.post('/login', async (req, res) => {
     const validPassword = await bcrypt.compare(cleanPassword, user.password);
 
     if (!validPassword) {
-      return res.status(401).json({ message: 'Invalid login details' });
+      return res.status(401).json({ message: 'Invalid login details.' });
     }
 
     const token = createToken(user);
