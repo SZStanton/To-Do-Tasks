@@ -75,31 +75,31 @@ A full-stack MERN task management application featuring secure user authenticati
 
 `server/.env`
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `MONGO_URI` | yes | MongoDB connection string, Atlas cluster or local mongod |
-| `JWT_SECRET` | yes | Long random string used to sign tokens |
-| `PORT` | no | Port the API listens on, defaults to `5000` |
-| `CLIENT_URL` | no | Frontend origin for CORS, defaults to `http://localhost:5173` |
+| Variable     | Required | Description                                                   |
+| ------------ | -------- | ------------------------------------------------------------- |
+| `MONGO_URI`  | yes      | MongoDB connection string, Atlas cluster or local mongod      |
+| `JWT_SECRET` | yes      | Long random string used to sign tokens                        |
+| `PORT`       | no       | Port the API listens on, defaults to `5000`                   |
+| `CLIENT_URL` | no       | Frontend origin for CORS, defaults to `http://localhost:5173` |
 
 `client/.env`
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `VITE_API_URL` | yes | Base URL of the backend, no trailing slash |
+| Variable       | Required | Description                                |
+| -------------- | -------- | ------------------------------------------ |
+| `VITE_API_URL` | yes      | Base URL of the backend, no trailing slash |
 
 ## Scripts
 
 Run these from the project root.
 
-| Script | What it does |
-| --- | --- |
-| `npm run dev` | Runs the API and the frontend together |
-| `npm run dev:server` | API only |
-| `npm run dev:client` | Frontend only |
-| `npm run setup` | Installs dependencies in `client` and `server` |
-| `npm run build` | Production build of the frontend |
-| `npm run lint` | Lints the frontend |
+| Script               | What it does                                   |
+| -------------------- | ---------------------------------------------- |
+| `npm run dev`        | Runs the API and the frontend together         |
+| `npm run dev:server` | API only                                       |
+| `npm run dev:client` | Frontend only                                  |
+| `npm run setup`      | Installs dependencies in `client` and `server` |
+| `npm run build`      | Production build of the frontend               |
+| `npm run lint`       | Lints the frontend                             |
 
 ## Future Improvements
 
