@@ -1,0 +1,18 @@
+{
+  "name": "to-do-tasks",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Full-stack MERN task manager with JWT authentication and private task lists.",
+  "license": "ISC",
+  "scripts": {
+    "setup": "npm --prefix client install && npm --prefix server install",
+    "dev": "concurrently -n server,client -c blue,magenta \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "dev:client": "npm --prefix client run dev",
+    "dev:server": "npm --prefix server run dev",
+    "build": "npm --prefix client run build",
+    "lint": "npm --prefix client run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.4"
+  }
+}
