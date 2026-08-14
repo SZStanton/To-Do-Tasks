@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import protect from '../middleware/auth.js';
 import jsonOnly from '../middleware/jsonOnly.js';
+import { loginLimiter, registerLimiter } from '../middleware/rateLimiters.js';
+import { registerSchema, loginSchema } from '../validation/authSchemas.js';
 
 const router = Router();
 
@@ -20,35 +22,52 @@ const cleanUser = user => ({
 });
 
 // == REGISTER ==
-router.post('/register', jsonOnly, async (req, res) => {
+router.post('/register', registerLimiter, jsonOnly, async (req, res) => {
   try {
-    const { name, email, username, password } = req.body;
+    const parsed = registerSchema.safeParse(req.body);
 
-    const cleanName = (name || '').trim();
-    const cleanEmail = (email || '').trim().toLowerCase();
-    const cleanUsername = (username || '').trim().toLowerCase();
-    const cleanPassword = (password || '').trim();
-
-    // Required fields check
-    if (!cleanName || !cleanEmail || !cleanUsername || !cleanPassword) {
-      return res.status(400).json({ message: 'All fields are required.' });
+    if (!parsed.success) {
+      return res.status(400).json({ message: parsed.error.issues[0].message });
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(cleanEmail)) {
-      return res.status(400).json({
-        message: 'Please enter a valid email address.',
+    // Zod has trimmed all of these and lowercased the email
+    const {
+      name: cleanName,
+      email: cleanEmail,
+      username: cleanUsername,
+      password: cleanPassword,
+    } = parsed.data;
+
+    // Strength 2 collation makes this case-insensitive, so an existing
+    // 'Jordan Blake' correctly blocks someone registering 'jordan blake'
+    const clashes = await User.find({
+      $or: [{ email: cleanEmail }, { username: cleanUsername }],
+    })
+      .collation({ locale: 'en', strength: 2 })
+      .select('email username');
+
+    const emailTaken = clashes.some(
+      found => found.email.toLowerCase() === cleanEmail,
+    );
+    const usernameTaken = clashes.some(
+      found => found.username.toLowerCase() === cleanUsername.toLowerCase(),
+    );
+
+    if (emailTaken && usernameTaken) {
+      return res.status(409).json({
+        message: 'That email and username are both already taken.',
       });
     }
 
-    // Check if user exists
-    const exists = await User.findOne({
-      $or: [{ email: cleanEmail }, { username: cleanUsername }],
-    });
-    if (exists) {
+    if (emailTaken) {
       return res.status(409).json({
-        message: 'Email or username already exists.',
+        message: 'That email is already registered.',
+      });
+    }
+
+    if (usernameTaken) {
+      return res.status(409).json({
+        message: 'That username is already taken.',
       });
     }
 
@@ -77,21 +96,25 @@ router.post('/register', jsonOnly, async (req, res) => {
 });
 
 // == LOGIN ==
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, jsonOnly, async (req, res) => {
   try {
-    const { identifier, password } = req.body;
-    const cleanIdentifier = (identifier || '').trim().toLowerCase();
-    const cleanPassword = (password || '').trim();
+    const parsed = loginSchema.safeParse(req.body);
 
-    if (!cleanIdentifier || !cleanPassword) {
-      return res.status(400).json({
-        message: 'Username/email and password are required.',
-      });
+    if (!parsed.success) {
+      return res.status(400).json({ message: parsed.error.issues[0].message });
     }
 
+    const { identifier: cleanIdentifier, password: cleanPassword } =
+      parsed.data;
+
+    // Identifier keeps its case now, so the email side is lowercased here and
+    // the username side is matched case-insensitively by the collation
     const user = await User.findOne({
-      $or: [{ email: cleanIdentifier }, { username: cleanIdentifier }],
-    });
+      $or: [
+        { email: cleanIdentifier.toLowerCase() },
+        { username: cleanIdentifier },
+      ],
+    }).collation({ locale: 'en', strength: 2 });
 
     if (!user) {
       return res.status(401).json({ message: 'Invalid login details.' });
@@ -100,7 +123,7 @@ router.post('/login', async (req, res) => {
     const validPassword = await bcrypt.compare(cleanPassword, user.password);
 
     if (!validPassword) {
-      return res.status(401).json({ message: 'Invalid login details' });
+      return res.status(401).json({ message: 'Invalid login details.' });
     }
 
     const token = createToken(user);

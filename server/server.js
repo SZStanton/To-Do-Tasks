@@ -11,6 +11,12 @@ connectDB();
 
 const app = express();
 
+// Hosts like Vercel sit behind a proxy, so the real client IP arrives in
+// X-Forwarded-For. Without this the rate limiter sees every visitor as one IP
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // == MIDDLEWARE ==
 // Allow frontend requests and read JSON bodies
 app.use(

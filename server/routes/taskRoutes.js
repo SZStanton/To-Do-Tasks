@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import Task from '../models/Task.js';
 import protect from '../middleware/auth.js';
-import gmailOnly from '../middleware/gmailOnly.js';
+import validEmail from '../middleware/validEmail.js';
 import jsonOnly from '../middleware/jsonOnly.js';
 import taskLength from '../middleware/taskLength.js';
 
@@ -10,8 +10,8 @@ const router = Router();
 // Every task route requires a valid JWT
 router.use(protect);
 
-// Every task route requires a @gmail.com username
-router.use(gmailOnly);
+// Every task route requires the account to have a valid email
+router.use(validEmail);
 
 //== HELPERS ==
 const toTask = task => ({
