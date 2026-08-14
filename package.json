@@ -2,6 +2,7 @@
   "name": "to-do-tasks",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Full-stack MERN task manager with JWT authentication and private task lists.",
   "license": "ISC",
   "scripts": {
@@ -10,9 +11,17 @@
     "dev:client": "npm --prefix client run dev",
     "dev:server": "npm --prefix server run dev",
     "build": "npm --prefix client run build",
-    "lint": "npm --prefix client run lint"
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "concurrently": "^10.0.4"
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^10.0.4",
+    "eslint": "^10.8.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.4",
+    "globals": "^17.11.0",
+    "prettier": "^3.9.6"
   }
 }
