@@ -1,0 +1,16 @@
+# Normalise line endings. Everything is stored as LF in the repo, and Git
+# checks it out however this machine wants it. Stops CRLF noise in diffs.
+* text=auto eol=lf
+
+# Binary, never touch these
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+
+# Lockfiles are generated, collapse them in diffs and PR reviews
+package-lock.json linguist-generated=true -diff
