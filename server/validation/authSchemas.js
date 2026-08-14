@@ -7,19 +7,20 @@ const emailField = z
   .toLowerCase()
   .pipe(z.email('Please enter a valid email address.'));
 
-// Case is kept, this is a display name. Registration checks for clashes
-// case-insensitively so 'Jordan Blake' and 'jordan blake' cannot both exist
-const usernameField = z
-  .string({ error: 'Username is required.' })
-  .trim()
-  .min(3, 'Username must be at least 3 characters.')
-  .max(30, 'Username must be 30 characters or less.')
-  .regex(
-    /^[\p{L}\p{N} '_-]+$/u,
-    'Username can only contain letters, numbers, spaces, apostrophes, hyphens and underscores.',
-  )
-  // Collapse double spaces so 'Jordan  Blake' cannot sit next to 'Jordan Blake'
-  .transform(value => value.replace(/\s+/g, ' '));
+// Shared by name and username. Case is kept, both are human-facing.
+// \p{L} and \p{N} rather than A-Za-z0-9 so accented names like Renée work
+const nameLikeField = (label, min, max) =>
+  z
+    .string({ error: `${label} is required.` })
+    .trim()
+    .min(min, `${label} must be at least ${min} characters.`)
+    .max(max, `${label} must be ${max} characters or less.`)
+    .regex(
+      /^[\p{L}\p{N} '_-]+$/u,
+      `${label} can only contain letters, numbers, spaces, apostrophes, hyphens and underscores.`,
+    )
+    // Collapse double spaces so 'Jordan  Blake' cannot sit next to 'Jordan Blake'
+    .transform(value => value.replace(/\s+/g, ' '));
 
 // 72 is bcrypt's limit. Anything longer is silently truncated, so reject it instead
 const passwordField = z
@@ -29,13 +30,9 @@ const passwordField = z
 
 //== REGISTER ==
 const registerSchema = z.object({
-  name: z
-    .string({ error: 'Name is required.' })
-    .trim()
-    .min(1, 'Name is required.')
-    .max(60, 'Name must be 60 characters or less.'),
+  name: nameLikeField('Name', 2, 60),
   email: emailField,
-  username: usernameField,
+  username: nameLikeField('Username', 3, 30),
   password: passwordField,
 });
 
