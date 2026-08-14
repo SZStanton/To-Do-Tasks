@@ -40,7 +40,7 @@ function Register() {
           className="text-muted text-center mb-4"
           style={{ fontSize: '0.9rem' }}
         >
-          Username must end with <code>@gmail.com</code>
+          Set up your account to start your to-do list
         </p>
 
         {/* Error message */}
@@ -76,10 +76,13 @@ function Register() {
               className="form-control"
               value={username}
               onChange={e => setUsername(e.target.value)}
-              placeholder="e.g. john@gmail.com"
+              placeholder="e.g. Jordan Blake"
               autoComplete="username"
             />
-            <div className="form-text">Must end with @gmail.com</div>
+            <div className="form-text">
+              3 to 30 characters. Letters, numbers, spaces, hyphens and
+              underscores.
+            </div>
           </div>
 
           <div className="mb-3">
@@ -92,6 +95,7 @@ function Register() {
               placeholder="Enter password"
               autoComplete="new-password"
             />
+            <div className="form-text">At least 8 characters.</div>
           </div>
 
           <button className="btn btn-success w-100" disabled={loading}>

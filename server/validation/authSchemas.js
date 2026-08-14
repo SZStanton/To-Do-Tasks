@@ -1,9 +1,25 @@
 import { z } from 'zod';
 
-// Trim and lowercase run before validation, so the routes get clean values back.
-// Takes its own message so a missing field never leaks zod's internal wording
-const identifierField = message =>
-  z.string({ error: message }).trim().toLowerCase();
+// Emails are lowercased so lookups match regardless of how they were typed
+const emailField = z
+  .string({ error: 'Email is required.' })
+  .trim()
+  .toLowerCase()
+  .pipe(z.email('Please enter a valid email address.'));
+
+// Case is kept, this is a display name. Registration checks for clashes
+// case-insensitively so 'Jordan Blake' and 'jordan blake' cannot both exist
+const usernameField = z
+  .string({ error: 'Username is required.' })
+  .trim()
+  .min(3, 'Username must be at least 3 characters.')
+  .max(30, 'Username must be 30 characters or less.')
+  .regex(
+    /^[\p{L}\p{N} '_-]+$/u,
+    'Username can only contain letters, numbers, spaces, apostrophes, hyphens and underscores.',
+  )
+  // Collapse double spaces so 'Jordan  Blake' cannot sit next to 'Jordan Blake'
+  .transform(value => value.replace(/\s+/g, ' '));
 
 // 72 is bcrypt's limit. Anything longer is silently truncated, so reject it instead
 const passwordField = z
@@ -18,26 +34,18 @@ const registerSchema = z.object({
     .trim()
     .min(1, 'Name is required.')
     .max(60, 'Name must be 60 characters or less.'),
-  email: identifierField('Email is required.').pipe(
-    z.email('Please enter a valid email address.'),
-  ),
-  // The register page has always advertised this rule, nothing enforced it
-  username: identifierField('Username is required.')
-    .min(1, 'Username is required.')
-    .refine(
-      value => value.endsWith('@gmail.com'),
-      'Username must end with @gmail.com.',
-    ),
+  email: emailField,
+  username: usernameField,
   password: passwordField,
 });
 
 //== LOGIN ==
-// No length rules here, they would only leak the password policy to strangers
+// Not lowercased here, the route matches it against both fields itself
 const loginSchema = z.object({
-  identifier: identifierField('Username or email is required.').min(
-    1,
-    'Username or email is required.',
-  ),
+  identifier: z
+    .string({ error: 'Username or email is required.' })
+    .trim()
+    .min(1, 'Username or email is required.'),
   password: z
     .string({ error: 'Password is required.' })
     .min(1, 'Password is required.'),

@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import protect from '../middleware/auth.js';
 import jsonOnly from '../middleware/jsonOnly.js';
+import { loginLimiter, registerLimiter } from '../middleware/rateLimiters.js';
 import { registerSchema, loginSchema } from '../validation/authSchemas.js';
 
 const router = Router();
@@ -21,7 +22,7 @@ const cleanUser = user => ({
 });
 
 // == REGISTER ==
-router.post('/register', jsonOnly, async (req, res) => {
+router.post('/register', registerLimiter, jsonOnly, async (req, res) => {
   try {
     const parsed = registerSchema.safeParse(req.body);
 
@@ -29,7 +30,7 @@ router.post('/register', jsonOnly, async (req, res) => {
       return res.status(400).json({ message: parsed.error.issues[0].message });
     }
 
-    // Zod has already trimmed and lowercased these
+    // Zod has trimmed all of these and lowercased the email
     const {
       name: cleanName,
       email: cleanEmail,
@@ -37,13 +38,36 @@ router.post('/register', jsonOnly, async (req, res) => {
       password: cleanPassword,
     } = parsed.data;
 
-    // Check if user exists
-    const exists = await User.findOne({
+    // Strength 2 collation makes this case-insensitive, so an existing
+    // 'Jordan Blake' correctly blocks someone registering 'jordan blake'
+    const clashes = await User.find({
       $or: [{ email: cleanEmail }, { username: cleanUsername }],
-    });
-    if (exists) {
+    })
+      .collation({ locale: 'en', strength: 2 })
+      .select('email username');
+
+    const emailTaken = clashes.some(
+      found => found.email.toLowerCase() === cleanEmail,
+    );
+    const usernameTaken = clashes.some(
+      found => found.username.toLowerCase() === cleanUsername.toLowerCase(),
+    );
+
+    if (emailTaken && usernameTaken) {
       return res.status(409).json({
-        message: 'Email or username already exists.',
+        message: 'That email and username are both already taken.',
+      });
+    }
+
+    if (emailTaken) {
+      return res.status(409).json({
+        message: 'That email is already registered.',
+      });
+    }
+
+    if (usernameTaken) {
+      return res.status(409).json({
+        message: 'That username is already taken.',
       });
     }
 
@@ -72,7 +96,7 @@ router.post('/register', jsonOnly, async (req, res) => {
 });
 
 // == LOGIN ==
-router.post('/login', jsonOnly, async (req, res) => {
+router.post('/login', loginLimiter, jsonOnly, async (req, res) => {
   try {
     const parsed = loginSchema.safeParse(req.body);
 
@@ -83,9 +107,14 @@ router.post('/login', jsonOnly, async (req, res) => {
     const { identifier: cleanIdentifier, password: cleanPassword } =
       parsed.data;
 
+    // Identifier keeps its case now, so the email side is lowercased here and
+    // the username side is matched case-insensitively by the collation
     const user = await User.findOne({
-      $or: [{ email: cleanIdentifier }, { username: cleanIdentifier }],
-    });
+      $or: [
+        { email: cleanIdentifier.toLowerCase() },
+        { username: cleanIdentifier },
+      ],
+    }).collation({ locale: 'en', strength: 2 });
 
     if (!user) {
       return res.status(401).json({ message: 'Invalid login details.' });
