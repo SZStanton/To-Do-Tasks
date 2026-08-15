@@ -1,5 +1,7 @@
 # To-Do List App
 
+**[Live demo](https://to-do-tasks-szstanton.vercel.app/)**
+
 A full-stack MERN task management application featuring secure user authentication, private task storage, and an intuitive interface for managing daily tasks. This project demonstrates a complete MERN stack build with JWT authentication, protected API routes, and persistent data storage, giving each user their own private task list.
 
 ## Screenshots
@@ -99,7 +101,8 @@ Run these from the project root.
 | `npm run dev:client` | Frontend only                                  |
 | `npm run setup`      | Installs dependencies in `client` and `server` |
 | `npm run build`      | Production build of the frontend               |
-| `npm run lint`       | Lints the frontend                             |
+| `npm run lint`       | Lints the whole project                        |
+| `npm run format`     | Formats the whole project with Prettier        |
 
 ## Future Improvements
 

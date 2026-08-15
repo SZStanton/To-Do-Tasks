@@ -47,13 +47,5 @@ export default defineConfig([
       globals: globals.node,
       sourceType: 'module',
     },
-    rules: {
-      // Express spots error handlers by their four arguments, so an unused
-      // trailing 'next' is required. Leading underscore marks that on purpose
-      'no-unused-vars': [
-        'error',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
-      ],
-    },
   },
 ]);
