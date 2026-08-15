@@ -2,6 +2,10 @@
 
 **[Live demo](https://to-do-tasks-szstanton.vercel.app/)**
 
+The API runs on a free tier that sleeps when idle, so the first load after a
+quiet spell can take up to a minute. The app pings it on load and shows a notice
+while it wakes, rather than leaving you waiting on a button.
+
 A full-stack MERN task management application featuring secure user authentication, private task storage, and an intuitive interface for managing daily tasks. This project demonstrates a complete MERN stack build with JWT authentication, protected API routes, and persistent data storage, giving each user their own private task list.
 
 ## Screenshots
