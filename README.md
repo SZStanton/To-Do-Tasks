@@ -44,11 +44,11 @@ A full-stack MERN task management application featuring secure user authenticati
    cd To-Do-Tasks
    ```
 
-2. Install dependencies for the root, the frontend and the backend
+2. Install dependencies. This is an npm workspace, so one install at the root
+   covers the frontend and the backend
 
    ```bash
    npm install
-   npm run setup
    ```
 
 3. Create the environment files from the examples
@@ -94,15 +94,15 @@ A full-stack MERN task management application featuring secure user authenticati
 
 Run these from the project root.
 
-| Script               | What it does                                   |
-| -------------------- | ---------------------------------------------- |
-| `npm run dev`        | Runs the API and the frontend together         |
-| `npm run dev:server` | API only                                       |
-| `npm run dev:client` | Frontend only                                  |
-| `npm run setup`      | Installs dependencies in `client` and `server` |
-| `npm run build`      | Production build of the frontend               |
-| `npm run lint`       | Lints the whole project                        |
-| `npm run format`     | Formats the whole project with Prettier        |
+| Script               | What it does                                  |
+| -------------------- | --------------------------------------------- |
+| `npm run dev`        | Runs the API and the frontend together        |
+| `npm run dev:server` | API only                                      |
+| `npm run dev:client` | Frontend only                                 |
+| `npm start`          | Runs the API alone, used by the deployed host |
+| `npm run build`      | Production build of the frontend              |
+| `npm run lint`       | Lints the whole project                       |
+| `npm run format`     | Formats the whole project with Prettier       |
 
 ## Future Improvements
 
