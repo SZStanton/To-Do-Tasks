@@ -18,10 +18,28 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // == MIDDLEWARE ==
-// Allow frontend requests and read JSON bodies
+// The live site and local dev. Every other Vercel URL is matched by the pattern
+const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173'].filter(
+  Boolean,
+);
+
+// Vercel gives each deployment its own subdomain, so previews and the git-main
+// alias never match CLIENT_URL. Anchored to the account slug, not any vercel.app
+const vercelPreview =
+  /^https:\/\/to-do-tasks-[a-z0-9-]+-szstanton\.vercel\.app$/;
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin(origin, callback) {
+      // Requests with no origin are curl, health checks and server to server
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin) || vercelPreview.test(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   }),
 );

@@ -14,6 +14,7 @@ import EditTask from './pages/EditTask';
 // Components
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
+import WakeBanner from './components/WakeBanner';
 
 // Main app structure + routing
 function App() {
@@ -23,6 +24,9 @@ function App() {
         <BrowserRouter>
           {/* Always visible header */}
           <Header />
+
+          {/* Only appears while the sleeping API is waking up */}
+          <WakeBanner />
 
           <div className="container py-4">
             <Routes>
