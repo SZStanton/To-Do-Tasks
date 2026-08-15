@@ -5,12 +5,16 @@
   "type": "module",
   "description": "Full-stack MERN task manager with JWT authentication and private task lists.",
   "license": "ISC",
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "setup": "npm --prefix client install && npm --prefix server install",
-    "dev": "concurrently -n server,client -c blue,magenta \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
-    "dev:client": "npm --prefix client run dev",
-    "dev:server": "npm --prefix server run dev",
-    "build": "npm --prefix client run build",
+    "dev": "concurrently -n server,client -c blue,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
+    "dev:client": "npm run dev -w client",
+    "dev:server": "npm run dev -w server",
+    "start": "npm start -w server",
+    "build": "npm run build -w client",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
