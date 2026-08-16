@@ -11,6 +11,13 @@
      calmer, bootstrap's own default is 500 */
   --heading-weight: 700;
 
+  /* Type and spacing knobs, all in one place. The root stays at 16px so every
+     bootstrap rem margin keeps its size, only the text itself gets smaller */
+  --bs-body-font-size: 0.9375rem; /* 15px, was 16 */
+  --bs-body-line-height: 1.65; /* bootstrap ships 1.5 */
+  --task-gap: 0.75rem; /* between task cards */
+  --card-padding: 1.25rem; /* inside every task card */
+
   font: 16px/150% var(--sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

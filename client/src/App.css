@@ -41,6 +41,13 @@
     transform 0.15s ease,
     box-shadow 0.15s ease;
   border-left: 4px solid var(--bs-primary);
+  /* Spacing lives on the tokens rather than bootstrap's mb-2 and py-3, so it
+     can be tuned from one place */
+  margin-bottom: var(--task-gap);
+}
+
+.task-card .card-body {
+  padding: var(--card-padding);
 }
 
 .task-card:hover {

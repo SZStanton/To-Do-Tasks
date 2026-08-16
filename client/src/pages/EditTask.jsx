@@ -43,7 +43,7 @@ function EditTaskForm({ task }) {
   const remaining = MAX_CHARS - title.length;
 
   return (
-    <div className="container py-4">
+    <div className="container py-5">
       {/* Page heading */}
       <div className="mb-4">
         <h2>Edit Task</h2>
@@ -110,7 +110,7 @@ function EditTask() {
     if (!loading && !task) navigate('/');
   }, [loading, task, navigate]);
 
-  if (loading) return <div className="container py-4">Loading task...</div>;
+  if (loading) return <div className="container py-5">Loading task...</div>;
   if (!task) return null;
 
   return <EditTaskForm task={task} />;
