@@ -9,6 +9,11 @@ import { registerSchema, loginSchema } from '../validation/authSchemas.js';
 
 const router = Router();
 
+// One message for both failures on purpose, saying which was wrong would tell a
+// stranger whether an account exists
+const LOGIN_FAILED =
+  'That username or password did not match. Please try again.';
+
 // Helper to create JWT
 const createToken = user =>
   jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -109,13 +114,13 @@ router.post('/login', loginLimiter, jsonOnly, async (req, res) => {
     });
 
     if (!user) {
-      return res.status(401).json({ message: 'Invalid login details.' });
+      return res.status(401).json({ message: LOGIN_FAILED });
     }
 
     const validPassword = await bcrypt.compare(cleanPassword, user.password);
 
     if (!validPassword) {
-      return res.status(401).json({ message: 'Invalid login details.' });
+      return res.status(401).json({ message: LOGIN_FAILED });
     }
 
     const token = createToken(user);
