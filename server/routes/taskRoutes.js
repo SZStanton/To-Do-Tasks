@@ -90,7 +90,7 @@ router.put('/:id', jsonOnly, taskLength, async (req, res) => {
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, user: req.user.id },
       update,
-      { new: true },
+      { returnDocument: 'after' },
     );
 
     if (!task) return res.status(404).json({ message: 'Task not found.' });
