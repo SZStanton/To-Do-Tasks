@@ -6,6 +6,7 @@ import protect from '../middleware/auth.js';
 import jsonOnly from '../middleware/jsonOnly.js';
 import { loginLimiter, registerLimiter } from '../middleware/rateLimiters.js';
 import { registerSchema, loginSchema } from '../validation/authSchemas.js';
+import { nextExpiry } from '../config/retention.js';
 
 const router = Router();
 
@@ -81,6 +82,7 @@ router.post('/register', registerLimiter, jsonOnly, async (req, res) => {
       email: cleanEmail,
       username: cleanUsername,
       password: hashedPassword,
+      expiresAt: nextExpiry(),
     });
 
     const token = createToken(user);
