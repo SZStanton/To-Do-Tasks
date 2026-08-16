@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuth from '../context/useAuth';
+import FormField from '../components/FormField';
+import { loginRules, firstError } from '../validation/authRules';
+
+const EMPTY = { identifier: '', password: '' };
+const ALL_TOUCHED = { identifier: true, password: true };
 
 //=== LOGIN PAGE ===
 // Handles user login using AuthContext
@@ -8,25 +13,38 @@ function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Form state
-  const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [values, setValues] = useState(EMPTY);
+  const [touched, setTouched] = useState({});
+  const [serverError, setServerError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  // Handle form submit
+  // No live checks needed, both fields only ever have to not be empty
+  const errorFor = field =>
+    touched[field] ? loginRules[field](values[field]) : '';
+
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setValues(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleBlur = e =>
+    setTouched(prev => ({ ...prev, [e.target.name]: true }));
+
   const handleSubmit = async e => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-    const result = await login({ identifier, password });
-    setLoading(false);
+    setServerError('');
+    setTouched(ALL_TOUCHED);
+
+    if (firstError(loginRules, values)) return;
+
+    setSubmitting(true);
+    const result = await login(values);
+    setSubmitting(false);
 
     if (!result.success) {
-      setError(result.message);
+      setServerError(result.message);
       return;
     }
-    // Redirect to dashboard on success
     navigate('/');
   };
 
@@ -38,44 +56,46 @@ function Login() {
           className="text-muted text-center mb-4"
           style={{ fontSize: '0.9rem' }}
         >
-          Sign in to your to-do list
+          Sign in to pick up where you left off
         </p>
 
-        {/* Error message */}
-        {error && <div className="alert alert-danger">{error}</div>}
-
-        {/* Login form */}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label">Username or Email</label>
-            <input
-              className="form-control"
-              value={identifier}
-              onChange={e => setIdentifier(e.target.value)}
-              placeholder="Enter username or email"
-              autoComplete="username"
-            />
+        {serverError && (
+          <div className="alert alert-danger" role="alert">
+            {serverError}
           </div>
+        )}
 
-          <div className="mb-3">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              className="form-control"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="Enter password"
-              autoComplete="current-password"
-            />
-          </div>
+        <form onSubmit={handleSubmit} noValidate>
+          <FormField
+            label="Username or email"
+            name="identifier"
+            value={values.identifier}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={errorFor('identifier')}
+            placeholder="jordan_blake or you@example.com"
+            autoComplete="username"
+          />
 
-          <button className="btn btn-primary w-100" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
+          <FormField
+            label="Password"
+            name="password"
+            type="password"
+            value={values.password}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={errorFor('password')}
+            placeholder="Enter your password"
+            autoComplete="current-password"
+          />
+
+          <button className="btn btn-primary w-100" disabled={submitting}>
+            {submitting ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
         <p className="text-center mt-3 mb-0">
-          Don't have an account? <Link to="/register">Register</Link>
+          Don&apos;t have an account? <Link to="/register">Create one</Link>
         </p>
       </div>
     </div>

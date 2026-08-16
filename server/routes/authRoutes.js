@@ -9,6 +9,11 @@ import { registerSchema, loginSchema } from '../validation/authSchemas.js';
 
 const router = Router();
 
+// One message for both failures on purpose, saying which was wrong would tell a
+// stranger whether an account exists
+const LOGIN_FAILED =
+  'That username or password did not match. Please try again.';
+
 // Helper to create JWT
 const createToken = user =>
   jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -38,19 +43,15 @@ router.post('/register', registerLimiter, jsonOnly, async (req, res) => {
       password: cleanPassword,
     } = parsed.data;
 
-    // Strength 2 collation makes this case-insensitive, so an existing
-    // 'Jordan Blake' correctly blocks someone registering 'jordan blake'
+    // Both fields are stored lowercase, so a plain match is enough and it can
+    // use the indexes, which a collation query cannot
     const clashes = await User.find({
       $or: [{ email: cleanEmail }, { username: cleanUsername }],
-    })
-      .collation({ locale: 'en', strength: 2 })
-      .select('email username');
+    }).select('email username');
 
-    const emailTaken = clashes.some(
-      found => found.email.toLowerCase() === cleanEmail,
-    );
+    const emailTaken = clashes.some(found => found.email === cleanEmail);
     const usernameTaken = clashes.some(
-      found => found.username.toLowerCase() === cleanUsername.toLowerCase(),
+      found => found.username === cleanUsername,
     );
 
     if (emailTaken && usernameTaken) {
@@ -107,23 +108,19 @@ router.post('/login', loginLimiter, jsonOnly, async (req, res) => {
     const { identifier: cleanIdentifier, password: cleanPassword } =
       parsed.data;
 
-    // Identifier keeps its case now, so the email side is lowercased here and
-    // the username side is matched case-insensitively by the collation
+    // Zod lowercased the identifier, and both fields are stored lowercase
     const user = await User.findOne({
-      $or: [
-        { email: cleanIdentifier.toLowerCase() },
-        { username: cleanIdentifier },
-      ],
-    }).collation({ locale: 'en', strength: 2 });
+      $or: [{ email: cleanIdentifier }, { username: cleanIdentifier }],
+    });
 
     if (!user) {
-      return res.status(401).json({ message: 'Invalid login details.' });
+      return res.status(401).json({ message: LOGIN_FAILED });
     }
 
     const validPassword = await bcrypt.compare(cleanPassword, user.password);
 
     if (!validPassword) {
-      return res.status(401).json({ message: 'Invalid login details.' });
+      return res.status(401).json({ message: LOGIN_FAILED });
     }
 
     const token = createToken(user);
