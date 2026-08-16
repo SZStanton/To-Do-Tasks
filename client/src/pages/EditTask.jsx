@@ -4,27 +4,16 @@ import useTasks from '../context/useTasks';
 
 const MAX_CHARS = 140;
 
-//=== EDIT TASK PAGE ===
-// Allows users to edit existing task
-function EditTask() {
-  const { id } = useParams();
+//=== EDIT TASK FORM ===
+// Only mounted once the task exists, so the initial title is always right
+function EditTaskForm({ task }) {
   const navigate = useNavigate();
-  const { getTask, updateTask, loading } = useTasks();
+  const { updateTask } = useTasks();
 
-  const task = getTask(id);
-  // Initialize title from task to avoid setting state synchronously in an effect
-  const [title, setTitle] = useState(() => (task ? task.title : ''));
+  const [title, setTitle] = useState(task.title);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Redirect if task not found
-  useEffect(() => {
-    if (!loading && !task) {
-      navigate('/');
-    }
-  }, [loading, task, navigate]);
-
-  // Handle form submission
   const handleSubmit = async e => {
     e.preventDefault();
     setError('');
@@ -40,7 +29,7 @@ function EditTask() {
     }
 
     setSubmitting(true);
-    const result = await updateTask(id, { title });
+    const result = await updateTask(task.id, { title });
     setSubmitting(false);
 
     if (!result.success) {
@@ -48,12 +37,8 @@ function EditTask() {
       return;
     }
 
-    // Return to dashboard
     navigate('/');
   };
-
-  // Loading State
-  if (loading) return <div className="container py-4">Loading task...</div>;
 
   const remaining = MAX_CHARS - title.length;
 
@@ -65,18 +50,25 @@ function EditTask() {
         <p className="text-muted mb-0">Update your task</p>
       </div>
 
-      <div className="card p-4 shadow-sm  task-form">
-        {error && <div className="alert alert-danger">{error}</div>}
+      <div className="card p-4 shadow-sm task-form">
+        {error && (
+          <div className="alert alert-danger" role="alert">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <div className="mb-3">
-            <label className="form-label">Task Title</label>
+            <label className="form-label" htmlFor="title">
+              Task Title
+            </label>
             <textarea
+              id="title"
               rows="3"
               className={`form-control${title.length > MAX_CHARS ? ' is-invalid' : ''}`}
               value={title}
               onChange={e => setTitle(e.target.value)}
-              placeholder="what needs to be done?"
+              placeholder="What needs to be done?"
             />
             <div
               className={`form-text text-end${remaining < 0 ? ' text-danger' : remaining < 20 ? ' text-warning' : ''}`}
@@ -101,6 +93,27 @@ function EditTask() {
       </div>
     </div>
   );
+}
+
+//=== EDIT TASK PAGE ===
+// Waits for the task before rendering the form. Reaching the form directly on a
+// refresh used to give an empty box, because the tasks had not arrived yet
+function EditTask() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { getTask, loading } = useTasks();
+
+  const task = getTask(id);
+
+  // Only give up once the tasks have actually loaded
+  useEffect(() => {
+    if (!loading && !task) navigate('/');
+  }, [loading, task, navigate]);
+
+  if (loading) return <div className="container py-4">Loading task...</div>;
+  if (!task) return null;
+
+  return <EditTaskForm task={task} />;
 }
 
 export default EditTask;
