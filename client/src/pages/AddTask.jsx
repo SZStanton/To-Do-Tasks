@@ -45,7 +45,7 @@ function AddTask() {
   const remaining = MAX_CHARS - title.length;
 
   return (
-    <div className="container py-4">
+    <div className="container py-5">
       {/* Page heading */}
       <div className="mb-4">
         <h2>Add Task</h2>

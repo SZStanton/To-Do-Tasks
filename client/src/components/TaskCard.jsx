@@ -9,9 +9,9 @@ function TaskCard({ task, onDelete, onToggle }) {
 
   return (
     <div
-      className={`task-card card mb-2 shadow-sm${task.completed ? ' task-done' : ''}`}
+      className={`task-card card shadow-sm${task.completed ? ' task-done' : ''}`}
     >
-      <div className="card-body d-flex align-items-center gap-3 py-3">
+      <div className="card-body d-flex align-items-center gap-3">
         {/* Completion Checkbox */}
         <input
           id={checkboxId}

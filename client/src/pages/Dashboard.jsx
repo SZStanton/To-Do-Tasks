@@ -20,7 +20,7 @@ function Dashboard() {
   const activeCount = tasks.filter(task => !task.completed).length;
 
   return (
-    <div className="container py-4">
+    <div className="container py-5">
       {/* Tasks heading */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
