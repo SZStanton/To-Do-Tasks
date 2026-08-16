@@ -1,32 +1,18 @@
+/* Bootstrap owns the colour system. The only token here is the page tint,
+   because bootstrap's own body background is plain white.
+   Anything that needs a colour uses a --bs- variable, never a hex value. */
 :root {
-  --text: #374151;
-  --text-h: #111827;
-  --bg: #f5f9ff;
-  --border: #e5e7eb;
-  --accent: #0d6efd;
-
+  --page-bg: #f5f9ff;
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
 
   font: 16px/150% var(--sans);
-  color: var(--text);
-  background: var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --accent: #60a5fa;
-  }
-}
-
 body {
   margin: 0;
-  background: var(--bg);
+  background: var(--page-bg);
 }
 
 #root {
@@ -37,10 +23,4 @@ body {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-}
-
-h1,
-h2,
-h3 {
-  color: var(--text-h);
 }

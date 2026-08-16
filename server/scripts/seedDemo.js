@@ -34,7 +34,7 @@ async function seedDemo() {
       // Explicitly cleared, a date here would let the TTL delete the demo
       $unset: { expiresAt: '' },
     },
-    { upsert: true, new: true, setDefaultsOnInsert: true },
+    { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
   );
 
   await resetDemoTasks(user._id);

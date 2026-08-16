@@ -28,44 +28,44 @@ function App() {
           {/* Only appears while the sleeping API is waking up */}
           <WakeBanner />
 
-          <div className="container py-4">
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+          {/* No container here on purpose. Each page owns its own layout, the
+              auth pages need to fill the viewport rather than sit in a box */}
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-              {/*Protected Routes*/}
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
+            {/*Protected Routes*/}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
 
-              <Route
-                path="/add"
-                element={
-                  <ProtectedRoute>
-                    <AddTask />
-                  </ProtectedRoute>
-                }
-              />
+            <Route
+              path="/add"
+              element={
+                <ProtectedRoute>
+                  <AddTask />
+                </ProtectedRoute>
+              }
+            />
 
-              <Route
-                path="/edit/:id"
-                element={
-                  <ProtectedRoute>
-                    <EditTask />
-                  </ProtectedRoute>
-                }
-              />
+            <Route
+              path="/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <EditTask />
+                </ProtectedRoute>
+              }
+            />
 
-              {/* Fallback Route */}
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </div>
+            {/* Fallback Route */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
         </BrowserRouter>
       </TasksProvider>
     </AuthProvider>
