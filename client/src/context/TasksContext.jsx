@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -25,6 +26,10 @@ function TasksProvider({ children }) {
   const [loading, setLoading] = useState(true);
   // Handles errors
   const [error, setError] = useState('');
+
+  // Counts requests per task id. Ticking a box four times fast leaves four
+  // replies racing back, and only the newest one should be allowed to land
+  const latestRequest = useRef({});
 
   //=== FETCH TASKS ===
   // Load tasks when user logs in
@@ -94,6 +99,17 @@ function TasksProvider({ children }) {
   //=== UPDATE TASK ===
   const updateTask = useCallback(
     async (id, updates) => {
+      // Show the change immediately. A round trip to Frankfurt is not something
+      // the person ticking a checkbox should have to sit through
+      const seq = (latestRequest.current[id] ?? 0) + 1;
+      latestRequest.current[id] = seq;
+      const isCurrent = () => latestRequest.current[id] === seq;
+
+      const snapshot = tasks;
+      setTasks(prev =>
+        prev.map(task => (task.id === id ? { ...task, ...updates } : task)),
+      );
+
       try {
         const response = await fetch(`${API_URL}/api/tasks/${id}`, {
           method: 'PUT',
@@ -107,21 +123,32 @@ function TasksProvider({ children }) {
         const data = await response.json();
 
         if (!response.ok) {
+          if (isCurrent()) setTasks(snapshot);
           return { success: false, message: data.message };
         }
 
-        setTasks(prev => prev.map(task => (task.id === id ? data : task)));
+        // Take the server's copy, it owns updatedAt and any trimming. Skipped
+        // if you have clicked again since, that reply is already out of date
+        if (isCurrent()) {
+          setTasks(prev => prev.map(task => (task.id === id ? data : task)));
+        }
         return { success: true };
       } catch {
+        if (isCurrent()) setTasks(snapshot);
         return { success: false, message: 'Could not update task.' };
       }
     },
-    [token],
+    [token, tasks],
   );
 
   //=== DELETE TASK ===
   const deleteTask = useCallback(
     async id => {
+      // Same reasoning as updateTask, it goes now and comes back if the server
+      // refuses. Deleting something and watching it sit there feels broken
+      const snapshot = tasks;
+      setTasks(prev => prev.filter(task => task.id !== id));
+
       try {
         const response = await fetch(`${API_URL}/api/tasks/${id}`, {
           method: 'DELETE',
@@ -130,16 +157,17 @@ function TasksProvider({ children }) {
 
         if (!response.ok) {
           const data = await response.json();
+          setTasks(snapshot);
           return { success: false, message: data.message };
         }
 
-        setTasks(prev => prev.filter(task => task.id !== id));
         return { success: true };
       } catch {
+        setTasks(snapshot);
         return { success: false, message: 'Could not delete task.' };
       }
     },
-    [token],
+    [token, tasks],
   );
 
   //=== GET SINGLE TASK ===

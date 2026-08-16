@@ -64,3 +64,11 @@
   height: 1.2rem;
   cursor: pointer;
 }
+
+.task-title {
+  cursor: pointer;
+  margin-bottom: 0;
+  /* Clicking toggles the task, so a double click selecting the words is just
+     in the way. The edit page is where you actually work with the text */
+  user-select: none;
+}
