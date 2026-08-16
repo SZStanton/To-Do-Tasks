@@ -56,7 +56,7 @@ function Dashboard() {
         <div className="alert alert-secondary">Loading tasks...</div>
       ) : filtered.length === 0 ? (
         <div className="alert alert-info">
-          {filter === 'ALL'
+          {filter === 'All'
             ? 'No tasks yet. Add one!'
             : `No ${filter.toLowerCase()} tasks.`}
         </div>
