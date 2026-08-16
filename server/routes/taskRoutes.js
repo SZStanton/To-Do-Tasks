@@ -20,7 +20,7 @@ const toTask = task => ({
   title: task.title,
   completed: task.completed,
   createdAt: task.createdAt,
-  updatedAt: task.updateAt,
+  updatedAt: task.updatedAt,
 });
 
 //== GET ALL TASKS ==
