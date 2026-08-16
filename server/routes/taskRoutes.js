@@ -59,6 +59,8 @@ router.post('/', jsonOnly, taskLength, async (req, res) => {
     const task = await Task.create({
       user: req.user.id,
       title: title.trim(),
+      // Inherit the owner's date rather than setting a later one of its own
+      expiresAt: req.user.expiresAt,
     });
 
     res.status(201).json(toTask(task));

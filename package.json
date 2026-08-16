@@ -17,7 +17,8 @@
     "build": "npm run build -w client",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "seed:demo": "npm run seed:demo -w server"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

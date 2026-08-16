@@ -7,6 +7,13 @@ import { loginRules, firstError } from '../validation/authRules';
 const EMPTY = { identifier: '', password: '' };
 const ALL_TOUCHED = { identifier: true, password: true };
 
+// Public on purpose. Both unset means no demo is configured, so the box is hidden
+const DEMO = {
+  identifier: import.meta.env.VITE_DEMO_USERNAME,
+  password: import.meta.env.VITE_DEMO_PASSWORD,
+};
+const HAS_DEMO = Boolean(DEMO.identifier && DEMO.password);
+
 //=== LOGIN PAGE ===
 // Handles user login using AuthContext
 function Login() {
@@ -97,6 +104,26 @@ function Login() {
         <p className="text-center mt-3 mb-0">
           Don&apos;t have an account? <Link to="/register">Create one</Link>
         </p>
+
+        {HAS_DEMO && (
+          <div className="alert alert-secondary small mt-3 mb-0">
+            <p className="mb-2">
+              Just looking? Try it without signing up. The demo account resets
+              its tasks every time you log in.
+            </p>
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-secondary"
+              onClick={() => {
+                setValues(DEMO);
+                setTouched({});
+                setServerError('');
+              }}
+            >
+              Use the demo account
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

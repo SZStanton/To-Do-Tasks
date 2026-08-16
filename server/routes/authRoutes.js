@@ -6,6 +6,8 @@ import protect from '../middleware/auth.js';
 import jsonOnly from '../middleware/jsonOnly.js';
 import { loginLimiter, registerLimiter } from '../middleware/rateLimiters.js';
 import { registerSchema, loginSchema } from '../validation/authSchemas.js';
+import { nextExpiry } from '../config/retention.js';
+import { resetDemoTasks } from '../config/demo.js';
 
 const router = Router();
 
@@ -81,6 +83,7 @@ router.post('/register', registerLimiter, jsonOnly, async (req, res) => {
       email: cleanEmail,
       username: cleanUsername,
       password: hashedPassword,
+      expiresAt: nextExpiry(),
     });
 
     const token = createToken(user);
@@ -122,6 +125,10 @@ router.post('/login', loginLimiter, jsonOnly, async (req, res) => {
     if (!validPassword) {
       return res.status(401).json({ message: LOGIN_FAILED });
     }
+
+    // Every visitor gets the same tidy starting point rather than the last
+    // person's leftovers
+    if (user.isDemo) await resetDemoTasks(user._id);
 
     const token = createToken(user);
 

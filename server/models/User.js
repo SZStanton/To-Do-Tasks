@@ -22,6 +22,13 @@ const userSchema = new mongoose.Schema(
       maxlength: 30,
     },
     password: { type: String, required: true },
+
+    // Mongo deletes the document once this passes. No date means never, which
+    // is exactly how the demo account is exempt without a special case
+    expiresAt: { type: Date, index: { expireAfterSeconds: 0 } },
+
+    // The shared account whose tasks reset on login. Never expires
+    isDemo: { type: Boolean, default: false },
   },
   { timestamps: true },
 );
