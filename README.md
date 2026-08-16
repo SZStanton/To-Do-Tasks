@@ -2,11 +2,17 @@
 
 **[Live demo](https://to-do-tasks-szstanton.vercel.app/)**
 
-The API runs on a free tier that sleeps when idle, so the first load after a
-quiet spell can take up to a minute. The app pings it on load and shows a notice
-while it wakes, rather than leaving you waiting on a button.
-
 A full-stack MERN task management application featuring secure user authentication, private task storage, and an intuitive interface for managing daily tasks. This project demonstrates a complete MERN stack build with JWT authentication, protected API routes, and persistent data storage, giving each user their own private task list.
+
+### Before you try it
+
+- The login page has a one click demo sign in, so you can look around without
+  creating an account. Its tasks reset on every sign in.
+- The API runs on a free tier that sleeps when idle, so the first load after a
+  quiet spell can take up to a minute. The app pings it on load and shows a
+  notice while it wakes, rather than leaving you waiting on a button.
+- Accounts you create are removed after 60 days of inactivity, along with their
+  tasks. Nothing personal is kept indefinitely.
 
 ## Screenshots
 
@@ -81,18 +87,22 @@ A full-stack MERN task management application featuring secure user authenticati
 
 `server/.env`
 
-| Variable     | Required | Description                                                   |
-| ------------ | -------- | ------------------------------------------------------------- |
-| `MONGO_URI`  | yes      | MongoDB connection string, Atlas cluster or local mongod      |
-| `JWT_SECRET` | yes      | Long random string used to sign tokens                        |
-| `PORT`       | no       | Port the API listens on, defaults to `5000`                   |
-| `CLIENT_URL` | no       | Frontend origin for CORS, defaults to `http://localhost:5173` |
+| Variable        | Required | Description                                                   |
+| --------------- | -------- | ------------------------------------------------------------- |
+| `MONGO_URI`     | yes      | MongoDB connection string, Atlas cluster or local mongod      |
+| `JWT_SECRET`    | yes      | Long random string used to sign tokens                        |
+| `PORT`          | no       | Port the API listens on, defaults to `5000`                   |
+| `CLIENT_URL`    | no       | Frontend origin for CORS, defaults to `http://localhost:5173` |
+| `DEMO_USERNAME` | no       | Username for the shared demo account                          |
+| `DEMO_PASSWORD` | no       | Password for it. Public by design, never reuse a real one     |
 
 `client/.env`
 
-| Variable       | Required | Description                                |
-| -------------- | -------- | ------------------------------------------ |
-| `VITE_API_URL` | yes      | Base URL of the backend, no trailing slash |
+| Variable             | Required | Description                                       |
+| -------------------- | -------- | ------------------------------------------------- |
+| `VITE_API_URL`       | yes      | Base URL of the backend, no trailing slash        |
+| `VITE_DEMO_USERNAME` | no       | Must match `DEMO_USERNAME`. Shows the demo button |
+| `VITE_DEMO_PASSWORD` | no       | Must match `DEMO_PASSWORD`                        |
 
 ## Scripts
 
@@ -107,6 +117,7 @@ Run these from the project root.
 | `npm run build`      | Production build of the frontend              |
 | `npm run lint`       | Lints the whole project                       |
 | `npm run format`     | Formats the whole project with Prettier       |
+| `npm run seed:demo`  | Creates or resets the shared demo account     |
 
 ## Future Improvements
 
