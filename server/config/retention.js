@@ -8,8 +8,12 @@ const RETENTION_DAYS = 60;
 // Sixty days from now, the date both the user and their tasks get
 const nextExpiry = () => new Date(Date.now() + RETENTION_DAYS * DAY_MS);
 
+// Binned tasks reuse the same TTL index, just with a much closer date
+const BIN_DAYS = 1;
+const binExpiry = () => new Date(Date.now() + BIN_DAYS * DAY_MS);
+
 // Only rewrite the date once it has drifted by a day, otherwise every request
 // would cost two extra writes. Active accounts cost about one write a day
 const needsRefresh = current => !current || nextExpiry() - current > DAY_MS;
 
-export { RETENTION_DAYS, nextExpiry, needsRefresh };
+export { RETENTION_DAYS, BIN_DAYS, nextExpiry, binExpiry, needsRefresh };

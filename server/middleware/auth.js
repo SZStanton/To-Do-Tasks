@@ -12,7 +12,8 @@ async function keepAlive(user) {
 
   await Promise.all([
     User.updateOne({ _id: user._id }, { expiresAt }),
-    Task.updateMany({ user: user._id }, { expiresAt }),
+    // Binned tasks are excluded, their 24 hour clock must not be pushed back
+    Task.updateMany({ user: user._id, deletedAt: null }, { expiresAt }),
   ]);
 
   user.expiresAt = expiresAt;

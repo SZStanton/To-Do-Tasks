@@ -434,6 +434,39 @@
   color: var(--on-fill);
 }
 
+/*=== Bin ===*/
+.task-action-restore {
+  color: var(--teal-strong);
+}
+
+.task-action-restore:hover,
+.task-action-restore:active {
+  background-color: var(--teal-strong);
+  color: var(--on-fill);
+}
+
+/* Binned cards are on their way out, so they sit back from the live ones */
+.task-binned {
+  border-left-color: var(--line-strong);
+  opacity: 0.85;
+}
+
+/* Nothing to click in the bin, the title is not a checkbox label here */
+.task-binned .task-title {
+  cursor: default;
+}
+
+.bin-countdown {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background-color: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+}
+
 /*=== Background. Two very soft washes so the page is not a flat block of
       cream. Fixed so they do not slide around as you scroll ===*/
 body {
