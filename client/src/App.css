@@ -94,6 +94,32 @@
     color 0.12s ease;
 }
 
+/* On a phone the words leave almost nothing for the task itself, so they are
+   hidden visually but kept for screen readers, which still need the label */
+@media (max-width: 575.98px) {
+  .task-action {
+    padding: 0 0.9rem;
+    font-size: 1rem;
+  }
+
+  .task-action span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .task-grip {
+    padding-left: 0.4rem;
+  }
+
+  .task-main {
+    padding: var(--card-padding) 0.6rem;
+  }
+}
+
 .task-card:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-md) !important;

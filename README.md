@@ -1,151 +1,132 @@
 # To-Do List App
 
+A full-stack MERN task manager with JWT authentication, protected API routes,
+drag and drop ordering, a recycle bin, and light and dark themes.
+
 **[Live demo](https://to-do-tasks-szstanton.vercel.app/)**
 
-A full-stack MERN task management application featuring secure user authentication, private task storage, and an intuitive interface for managing daily tasks. This project demonstrates a complete MERN stack build with JWT authentication, protected API routes, and persistent data storage, giving each user their own private task list.
-
-### Before you try it
-
-- The login page has a one click demo sign in, so you can look around without
-  creating an account. Its tasks reset on every sign in.
-- The API runs on a free tier that sleeps when idle, so the first load after a
-  quiet spell can take up to a minute. The app pings it on load and shows a
-  notice while it wakes, rather than leaving you waiting on a button.
-- Accounts you create are removed after 60 days of inactivity, along with their
-  tasks. Nothing personal is kept indefinitely.
+The login page has a one click demo sign in, so you can look around without
+creating an account. The API is on a free tier that sleeps when idle, so the
+first load can take up to a minute while it wakes.
 
 ## Screenshots
 
 <table>
   <tr>
-    <td><img src="screenshots/register.png" width="300" alt="Register page"/></td>
-    <td><img src="screenshots/dashboard.png" width="300" alt="Task dashboard"/></td>
-    <td><img src="screenshots/add-task.png" width="300" alt="Add task page"/></td>
+    <td align="center">
+      <strong>Login, light</strong><br/>
+      <img src="screenshots/login-light.png" width="380" alt="Login page in the light theme"/>
+    </td>
+    <td align="center">
+      <strong>Dashboard, light</strong><br/>
+      <img src="screenshots/dashboard-light.png" width="380" alt="Task dashboard in the light theme"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <strong>Login, dark</strong><br/>
+      <img src="screenshots/login-dark.png" width="380" alt="Login page in the dark theme"/>
+    </td>
+    <td align="center">
+      <strong>Dashboard, dark</strong><br/>
+      <img src="screenshots/dashboard-dark.png" width="380" alt="Task dashboard in the dark theme"/>
+    </td>
   </tr>
 </table>
 
 ## Features
 
-- Secure user registration and login with hashed password validation
-- JWT authentication and protected API routes
-- Create, edit, complete, and delete tasks
-- Drag to reorder, with keyboard support through the grip handle
-- Deleted tasks go to a bin, restorable for 24 hours before they clear themselves
+- User registration and login with JWT authentication
+- Create, edit, complete and delete tasks
+- Drag and drop reordering, operable by keyboard
+- Recycle bin, restorable for 24 hours before it clears itself
+- Filtering and a remaining task counter
 - Light and dark themes, remembered between visits
-- Filter tasks by All / Active / Completed
-- Task counter showing tasks remaining
-- Responsive React interface
+- Rate limited authentication and protected API routes
 
 ## Tech Stack
 
-**Frontend:** React, Context API, Vite
+| Area       | Technologies                           |
+| ---------- | -------------------------------------- |
+| Frontend   | React, Vite, React Router, Context API |
+| Backend    | Node.js, Express, Mongoose             |
+| Database   | MongoDB Atlas                          |
+| Styling    | Bootstrap, CSS custom properties       |
+| Validation | Zod                                    |
+| Testing    | Vitest, Testing Library                |
+| Deployment | Vercel, Render                         |
 
-**Backend:** Node.js, Express, MongoDB, Mongoose, JWT
+## API
 
-## Project Structure
+Task routes require a `Bearer` token. Deleting is a soft delete, so a task moves
+to the bin rather than being destroyed.
 
-**Frontend:** components, context, pages, App.jsx, main.jsx
+| Method   | Endpoint                   | Body                              |
+| -------- | -------------------------- | --------------------------------- |
+| `POST`   | `/api/auth/register`       | `name, email, username, password` |
+| `POST`   | `/api/auth/login`          | `identifier, password`            |
+| `GET`    | `/api/auth/me`             |                                   |
+| `GET`    | `/api/tasks`               |                                   |
+| `POST`   | `/api/tasks`               | `title`                           |
+| `PUT`    | `/api/tasks/:id`           | `title` and/or `completed`        |
+| `DELETE` | `/api/tasks/:id`           | moves it to the bin               |
+| `PUT`    | `/api/tasks/reorder`       | `ids`, the list in its new order  |
+| `GET`    | `/api/tasks/bin`           |                                   |
+| `PUT`    | `/api/tasks/:id/restore`   |                                   |
+| `DELETE` | `/api/tasks/:id/permanent` |                                   |
+| `DELETE` | `/api/tasks/bin`           | empties the bin                   |
 
-**Backend:** config, middleware, models, routes, server.js
+`identifier` accepts either the username or the email.
 
-## Installation
+## Getting Started
 
-1. Clone the repository and enter the folder
+Requires Node 24 and a MongoDB Atlas cluster.
 
-   ```bash
-   git clone https://github.com/SZStanton/To-Do-Tasks
-   cd To-Do-Tasks
-   ```
+```bash
+git clone https://github.com/SZStanton/To-Do-Tasks
+cd To-Do-Tasks
+npm install
+```
 
-2. Install dependencies. This is an npm workspace, so one install at the root
-   covers the frontend and the backend
+Create the environment files and fill them in:
 
-   ```bash
-   npm install
-   ```
+```bash
+cp server/.env.example server/.env
+cp client/.env.example client/.env
+```
 
-3. Create the environment files from the examples
+| Variable                     | Where         | Notes                            |
+| ---------------------------- | ------------- | -------------------------------- |
+| `MONGO_URI`                  | `server/.env` | include the database name        |
+| `JWT_SECRET`                 | `server/.env` | any long random string           |
+| `VITE_API_URL`               | `client/.env` | the API's URL, no trailing slash |
+| `DEMO_USERNAME`, `_PASSWORD` | both          | optional, enables the demo login |
 
-   ```bash
-   cp server/.env.example server/.env
-   cp client/.env.example client/.env
-   ```
+Then run both halves together:
 
-4. Fill in `server/.env` with your MongoDB connection string and a JWT secret. See
-   [Environment variables](#environment-variables) below. Generate a secret with:
+```bash
+npm run dev        # api and frontend
+npm test           # test suite
+npm run build      # production build of the frontend
+```
 
-   ```bash
-   node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
-   ```
+## Testing
 
-5. Start the API and the frontend together
-
-   ```bash
-   npm run dev
-   ```
-
-6. Open http://localhost:5173 in your browser
-
-## Environment variables
-
-`server/.env`
-
-| Variable        | Required | Description                                                   |
-| --------------- | -------- | ------------------------------------------------------------- |
-| `MONGO_URI`     | yes      | MongoDB connection string, Atlas cluster or local mongod      |
-| `JWT_SECRET`    | yes      | Long random string used to sign tokens                        |
-| `PORT`          | no       | Port the API listens on, defaults to `5000`                   |
-| `CLIENT_URL`    | no       | Frontend origin for CORS, defaults to `http://localhost:5173` |
-| `DEMO_USERNAME` | no       | Username for the shared demo account                          |
-| `DEMO_PASSWORD` | no       | Password for it. Public by design, never reuse a real one     |
-
-`client/.env`
-
-| Variable             | Required | Description                                       |
-| -------------------- | -------- | ------------------------------------------------- |
-| `VITE_API_URL`       | yes      | Base URL of the backend, no trailing slash        |
-| `VITE_DEMO_USERNAME` | no       | Must match `DEMO_USERNAME`. Shows the demo button |
-| `VITE_DEMO_PASSWORD` | no       | Must match `DEMO_PASSWORD`                        |
-
-## Scripts
-
-Run these from the project root.
-
-| Script               | What it does                                  |
-| -------------------- | --------------------------------------------- |
-| `npm run dev`        | Runs the API and the frontend together        |
-| `npm run dev:server` | API only                                      |
-| `npm run dev:client` | Frontend only                                 |
-| `npm start`          | Runs the API alone, used by the deployed host |
-| `npm run build`      | Production build of the frontend              |
-| `npm run lint`       | Lints the whole project                       |
-| `npm run format`     | Formats the whole project with Prettier       |
-| `npm run seed:demo`  | Creates or resets the shared demo account     |
-| `npm test`           | Runs the test suite once                      |
-| `npm run test:watch` | Reruns tests as files change                  |
-
-## Tests
-
-Vitest, run from the root across both workspaces. The server half runs in Node,
-the client half in jsdom with Testing Library.
+Vitest and Testing Library, covering the validation schemas, a cross check that
+the client and server validation produce identical messages, and the key
+components.
 
 ```bash
 npm test
 ```
 
-What is covered:
+## What I Learned
 
-- The auth validation schemas, which are where the real rules live
-- A cross-check that the client's copy of those rules produces **identical**
-  messages to the server's, so the two cannot drift apart silently
-- `FormField`, including the hint versus error behaviour and the password toggle
-- `TaskCard`, including that the title acts as the checkbox label
-
-Not covered: the routes and the database. That needs `supertest` and either a
-test database or `mongodb-memory-server`, which is a different piece of work.
-
-## Future Improvements
-
-- Task due dates and reminders
-- Task categories/tags
-- Dark/light mode toggle
+- Building a complete authentication flow, from registering an account through
+  logging in and out, with a session that survives a page reload
+- Implementing JWT authentication and protecting Express routes with middleware
+- Designing a MongoDB data model, including soft deletes and TTL indexes for
+  automatic cleanup
+- Sharing one set of validation rules between client and server, with tests that
+  fail if the two ever disagree
+- Deploying a full stack application across Vercel, Render and Atlas
