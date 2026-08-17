@@ -15,21 +15,21 @@ first load can take up to a minute while it wakes.
   <tr>
     <td align="center">
       <strong>Login, light</strong><br/>
-      <img src="screenshots/login-light.png" width="380" alt="Login page in the light theme"/>
+      <img src="screenshots/login-light.jpg" width="380" alt="Login page in the light theme"/>
     </td>
     <td align="center">
       <strong>Dashboard, light</strong><br/>
-      <img src="screenshots/dashboard-light.png" width="380" alt="Task dashboard in the light theme"/>
+      <img src="screenshots/dashboard-light.jpg" width="380" alt="Task dashboard in the light theme"/>
     </td>
   </tr>
   <tr>
     <td align="center">
       <strong>Login, dark</strong><br/>
-      <img src="screenshots/login-dark.png" width="380" alt="Login page in the dark theme"/>
+      <img src="screenshots/login-dark.jpg" width="380" alt="Login page in the dark theme"/>
     </td>
     <td align="center">
       <strong>Dashboard, dark</strong><br/>
-      <img src="screenshots/dashboard-dark.png" width="380" alt="Task dashboard in the dark theme"/>
+      <img src="screenshots/dashboard-dark.jpg" width="380" alt="Task dashboard in the dark theme"/>
     </td>
   </tr>
 </table>
@@ -130,3 +130,4 @@ npm test
 - Sharing one set of validation rules between client and server, with tests that
   fail if the two ever disagree
 - Deploying a full stack application across Vercel, Render and Atlas
+
