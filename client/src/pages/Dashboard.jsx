@@ -1,5 +1,23 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  restrictToParentElement,
+  restrictToVerticalAxis,
+} from '@dnd-kit/modifiers';
 import useTasks from '../context/useTasks';
 import TaskCard from '../components/TaskCard';
 
@@ -8,16 +26,61 @@ const FILTERS = ['All', 'Active', 'Completed'];
 //=== DASHBOARD PAGE ===
 // Displays all tasks with filter tabs
 function Dashboard() {
-  const { tasks, deleteTask, updateTask, loading, error } = useTasks();
+  const { tasks, deleteTask, updateTask, reorderTasks, loading, error } =
+    useTasks();
   const [filter, setFilter] = useState('All');
 
-  const filtered = tasks.filter(task => {
-    if (filter === 'Active') return !task.completed;
-    if (filter === 'Completed') return task.completed;
-    return true;
-  });
+  // Memoised because a drag re-renders this on every pointer move, and a fresh
+  // array each time makes the sortable list re-register its items
+  const filtered = useMemo(
+    () =>
+      tasks.filter(task => {
+        if (filter === 'Active') return !task.completed;
+        if (filter === 'Completed') return task.completed;
+        return true;
+      }),
+    [tasks, filter],
+  );
+
+  const itemIds = useMemo(() => filtered.map(task => task.id), [filtered]);
 
   const activeCount = tasks.filter(task => !task.completed).length;
+
+  // Reordering a list that is hiding half its items produces an order you
+  // cannot see, so dragging is only on when everything is shown
+  const canReorder = filter === 'All' && filtered.length > 1;
+
+  const sensors = useSensors(
+    // A small distance first, or a click on the grip counts as a drag
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = ({ active, over }) => {
+    if (!over || active.id === over.id) return;
+
+    const from = tasks.findIndex(task => task.id === active.id);
+    const to = tasks.findIndex(task => task.id === over.id);
+    if (from === -1 || to === -1) return;
+
+    reorderTasks(arrayMove(tasks, from, to));
+  };
+
+  const list = (
+    <div className="task-list">
+      {filtered.map(task => (
+        <TaskCard
+          key={task.id}
+          task={task}
+          sortable={canReorder}
+          onDelete={deleteTask}
+          onToggle={completed => updateTask(task.id, { completed })}
+        />
+      ))}
+    </div>
+  );
 
   return (
     <div className="container py-5">
@@ -64,17 +127,24 @@ function Dashboard() {
             ? 'No tasks yet. Add one!'
             : `No ${filter.toLowerCase()} tasks.`}
         </div>
+      ) : canReorder ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+          /* Up and down only, and it cannot leave the list and float over
+             the tabs above it */
+          modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+        >
+          <SortableContext
+            items={itemIds}
+            strategy={verticalListSortingStrategy}
+          >
+            {list}
+          </SortableContext>
+        </DndContext>
       ) : (
-        <div className="task-list">
-          {filtered.map(task => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              onDelete={deleteTask}
-              onToggle={completed => updateTask(task.id, { completed })}
-            />
-          ))}
-        </div>
+        list
       )}
     </div>
   );

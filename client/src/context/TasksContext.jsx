@@ -170,6 +170,41 @@ function TasksProvider({ children }) {
     [token, tasks],
   );
 
+  //=== REORDER ===
+  const reorderTasks = useCallback(
+    async ordered => {
+      // The list has already moved under the cursor, so this only has to
+      // persist it and put things back if the server disagrees
+      const snapshot = tasks;
+      setTasks(ordered);
+
+      try {
+        const response = await fetch(`${API_URL}/api/tasks/reorder`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ ids: ordered.map(task => task.id) }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setTasks(snapshot);
+          return { success: false, message: data.message };
+        }
+
+        setTasks(data);
+        return { success: true };
+      } catch {
+        setTasks(snapshot);
+        return { success: false, message: 'Could not save the new order.' };
+      }
+    },
+    [token, tasks],
+  );
+
   //=== THE BIN ===
   // Fetched on demand rather than kept in sync, nobody sits watching the bin
   const [bin, setBin] = useState([]);
@@ -287,6 +322,7 @@ function TasksProvider({ children }) {
       addTask,
       updateTask,
       deleteTask,
+      reorderTasks,
       getTask,
       bin,
       binLoading,
@@ -302,6 +338,7 @@ function TasksProvider({ children }) {
       addTask,
       updateTask,
       deleteTask,
+      reorderTasks,
       getTask,
       bin,
       binLoading,
