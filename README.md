@@ -121,10 +121,31 @@ Run these from the project root.
 | `npm run lint`       | Lints the whole project                       |
 | `npm run format`     | Formats the whole project with Prettier       |
 | `npm run seed:demo`  | Creates or resets the shared demo account     |
+| `npm test`           | Runs the test suite once                      |
+| `npm run test:watch` | Reruns tests as files change                  |
+
+## Tests
+
+Vitest, run from the root across both workspaces. The server half runs in Node,
+the client half in jsdom with Testing Library.
+
+```bash
+npm test
+```
+
+What is covered:
+
+- The auth validation schemas, which are where the real rules live
+- A cross-check that the client's copy of those rules produces **identical**
+  messages to the server's, so the two cannot drift apart silently
+- `FormField`, including the hint versus error behaviour and the password toggle
+- `TaskCard`, including that the title acts as the checkbox label
+
+Not covered: the routes and the database. That needs `supertest` and either a
+test database or `mongodb-memory-server`, which is a different piece of work.
 
 ## Future Improvements
 
 - Task due dates and reminders
 - Task categories/tags
-- Drag-and-drop task reordering
 - Dark/light mode toggle
