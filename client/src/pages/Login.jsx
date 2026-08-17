@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuth from '../context/useAuth';
 import FormField from '../components/FormField';
@@ -24,6 +24,15 @@ function Login() {
   const [touched, setTouched] = useState({});
   const [serverError, setServerError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const signInRef = useRef(null);
+
+  // Filling the form and leaving them hunting for the button is half a job
+  const useDemoAccount = () => {
+    setValues(DEMO);
+    setTouched({});
+    setServerError('');
+    signInRef.current?.focus();
+  };
 
   // No live checks needed, both fields only ever have to not be empty
   const errorFor = field =>
@@ -63,7 +72,7 @@ function Login() {
           className="text-muted text-center mb-4"
           style={{ fontSize: '0.9rem' }}
         >
-          Sign in to pick up where you left off
+          Log in to pick up where you left off
         </p>
 
         {serverError && (
@@ -96,29 +105,29 @@ function Login() {
             autoComplete="current-password"
           />
 
-          <button className="btn btn-primary w-100" disabled={submitting}>
-            {submitting ? 'Signing in...' : 'Sign In'}
+          <button
+            ref={signInRef}
+            className="btn btn-primary w-100"
+            disabled={submitting}
+          >
+            {submitting ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
         <p className="text-center mt-3 mb-0">
-          Don&apos;t have an account? <Link to="/register">Create one</Link>
+          Don&apos;t have an account? <Link to="/register">Register</Link>
         </p>
 
         {HAS_DEMO && (
-          <div className="alert alert-secondary small mt-3 mb-0">
-            <p className="mb-2">
+          <div className="app-demo-prompt mt-3">
+            <p className="small text-muted mb-2">
               Just looking? Try it without signing up. The demo account resets
               its tasks every time you log in.
             </p>
             <button
               type="button"
-              className="btn btn-sm btn-outline-secondary"
-              onClick={() => {
-                setValues(DEMO);
-                setTouched({});
-                setServerError('');
-              }}
+              className="btn btn-sm btn-primary"
+              onClick={useDemoAccount}
             >
               Use the demo account
             </button>

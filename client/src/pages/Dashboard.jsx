@@ -30,8 +30,12 @@ function Dashboard() {
           </p>
         </div>
         {/* Add task button */}
-        <Link to="/add" className="btn btn-primary">
-          + Add Task
+        <Link
+          to="/add"
+          className="btn btn-primary app-add-btn d-flex align-items-center gap-2"
+        >
+          <i className="bi bi-plus-lg" aria-hidden="true" />
+          Add Task
         </Link>
       </div>
 

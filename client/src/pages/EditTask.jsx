@@ -60,7 +60,7 @@ function EditTaskForm({ task }) {
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-3">
             <label className="form-label" htmlFor="title">
-              Task Title
+              Your task
             </label>
             <textarea
               id="title"
@@ -68,7 +68,7 @@ function EditTaskForm({ task }) {
               className={`form-control${title.length > MAX_CHARS ? ' is-invalid' : ''}`}
               value={title}
               onChange={e => setTitle(e.target.value)}
-              placeholder="What needs to be done?"
+              placeholder="e.g. Book the dentist"
             />
             <div
               className={`form-text text-end${remaining < 0 ? ' text-danger' : remaining < 20 ? ' text-warning' : ''}`}

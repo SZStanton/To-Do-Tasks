@@ -130,7 +130,7 @@ function Register() {
             onChange={handleChange}
             onBlur={handleBlur}
             error={errorFor('username')}
-            hint="What you sign in with. 3 to 30 characters, no spaces."
+            hint="What you log in with. 3 to 30 characters, no spaces."
             placeholder="e.g. jordan_blake"
             autoComplete="username"
           />
@@ -154,7 +154,7 @@ function Register() {
         </form>
 
         <p className="text-center mt-3 mb-0">
-          Already have an account? <Link to="/login">Sign in</Link>
+          Already have an account? <Link to="/login">Login</Link>
         </p>
       </div>
     </div>

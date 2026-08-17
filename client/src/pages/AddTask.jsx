@@ -57,13 +57,13 @@ function AddTask() {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="form-label">Task Title</label>
+            <label className="form-label">Your task</label>
             <textarea
               rows="3"
               className={`form-control${title.length > MAX_CHARS ? ' is-invalid' : ''}`}
               value={title}
               onChange={e => setTitle(e.target.value)}
-              placeholder="What needs to be done?"
+              placeholder="e.g. Book the dentist"
             />
             <div
               className={`form-text text-end${remaining < 0 ? ' text-danger' : remaining < 20 ? ' text-warning' : ''}`}
