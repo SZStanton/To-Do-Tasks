@@ -1,8 +1,6 @@
-/* Bootstrap owns the colour system. The only token here is the page tint,
-   because bootstrap's own body background is plain white.
-   Anything that needs a colour uses a --bs- variable, never a hex value. */
+/* Type and layout only. Colour lives in theme.css, and nothing in the app
+   names a colour outside that file. */
 :root {
-  --page-bg: #f5f9ff;
   --sans: 'Plus Jakarta Sans Variable', system-ui, 'Segoe UI', sans-serif;
 
   /* Bootstrap sets its own family on body, so it has to be told too */
@@ -34,7 +32,6 @@ h4,
 
 body {
   margin: 0;
-  background: var(--page-bg);
 }
 
 /* No max-width here. It boxed the navbar into a 1200px column, so zooming out

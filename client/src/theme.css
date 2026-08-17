@@ -1,0 +1,501 @@
+/* Warm workspace, the light theme. See reference/design-notes.md for the
+   direction and the contrast numbers behind every value here.
+
+   Background is atmosphere, cards are clarity, accent is interaction.
+
+   Note bootstrap does NOT read --bs-primary at runtime. Every .btn-* variant
+   hardcodes its own hex, so each one used in the app is remapped below. */
+
+:root {
+  /*=== The palette. Nothing outside this block names a colour ===*/
+  --bg: #f8f4ed; /* warm paper, the room */
+  --surface: #fffdf8; /* cards */
+  --surface-2: #e8ded0; /* secondary surfaces */
+  --line: #e0d6c8; /* borders, warmer than bootstrap grey */
+  /* Card and input edges. The page is only 1.08 from a card, so the border and
+     the shadow are what actually separate them, not the tone */
+  --line-strong: #d6c9b5;
+
+  --accent: #efcba1; /* light peach. Soft text on it, 5.49 */
+  /* Hover goes lighter, not darker. Darkening drops the text below 4.5, and the
+     lift and shadow already say "this is interactive" */
+  --accent-hover: #f2d3ae; /* 5.88 */
+  --accent-active: #e9be8e; /* 4.89 */
+  --accent-strong: #a96417; /* 4.57 on a card, 86% sat so it reads orange */
+
+  /* A deeper orange, used where a fill needs white on it. The light peach
+     cannot carry white at all, it manages 1.6 */
+  --accent-fill: #a85a14; /* white on it, 4.99. 88% sat, not brown */
+  --accent-fill-rgb: 168, 90, 20;
+  --accent-fill-hover: #b25e12; /* white 4.59 */
+
+  /* Buttons differ by theme: pale peach with soft text in light, deeper orange
+     with white in dark. Both keep the accent hue */
+  --btn-bg: var(--accent);
+  --btn-bg-hover: var(--accent-hover);
+  --btn-bg-active: var(--accent-active);
+  --btn-text: var(--on-accent);
+
+  --tab-inactive: #6b6357; /* 5.40 on the page, the accent was 4.05 and vanished */
+
+  --teal: #7b9b98; /* stops the screen becoming a sea of beige */
+  --teal-strong: #5a7a77;
+
+  --text: #3e3933;
+  --text-muted: #7a7266; /* card only, 4.33 on --bg is still too low */
+
+  /* Softer than --text on purpose, the near black read as harsh on peach */
+  --on-accent: #554c42; /* 5.49 on the light peach */
+  --on-fill: #fffdf8; /* what sits on the deeper orange and on red */
+
+  /* Destructive stays red on purpose. Errors should not feel warm and inviting */
+  --danger: #b3382c;
+  --danger-fill: #c0453a;
+  --danger-fill-rgb: 192, 69, 58;
+
+  /* Warm tinted rather than black, so shadows sit in the palette instead of
+     greying it. Dark mode swaps these for a glow */
+  /* Cards lean on this rather than on tone, so it does real work in light mode */
+  --shadow-sm:
+    0 1px 3px rgba(62, 57, 51, 0.1), 0 6px 20px rgba(62, 57, 51, 0.09);
+  --shadow-md:
+    0 2px 4px rgba(62, 57, 51, 0.07), 0 10px 28px rgba(62, 57, 51, 0.09);
+
+  /* Buttons carry a real shadow at rest, or they read as flat coloured boxes
+     rather than something you can press */
+  --shadow-btn:
+    0 1px 2px rgba(62, 57, 51, 0.18), 0 3px 8px rgba(62, 57, 51, 0.12);
+  --shadow-btn-hover:
+    0 3px 6px rgba(62, 57, 51, 0.2), 0 10px 22px rgba(62, 57, 51, 0.16);
+  --shadow-btn-active: 0 1px 1px rgba(62, 57, 51, 0.22);
+  /* Small utility buttons, the shadow was overpowering them */
+  --shadow-btn-subtle: 0 1px 2px rgba(62, 57, 51, 0.1);
+  --shadow-btn-subtle-hover: 0 2px 5px rgba(62, 57, 51, 0.14);
+
+  /*=== Bootstrap core, the parts it does read at runtime ===*/
+  --bs-body-bg: var(--bg);
+  --bs-body-color: var(--text);
+  --bs-emphasis-color: var(--text);
+  --bs-heading-color: var(--text);
+  --bs-secondary-color: var(--text-muted);
+  --bs-secondary-bg: var(--surface-2);
+  --bs-tertiary-bg: var(--surface-2);
+  --bs-border-color: var(--line);
+
+  /* accent-hover is a pale peach, it was invisible as a link colour */
+  --bs-link-color: var(--accent-strong);
+  --bs-link-hover-color: var(--text);
+
+  --bs-card-bg: var(--surface);
+  --bs-card-border-color: var(--line-strong);
+
+  /* A shade above the page but still below the card, so an input reads as a
+     well without going flat white against the card around it */
+  --input-bg: #fbf8f2;
+  --bs-form-control-bg: var(--input-bg);
+
+  /* Bootstrap's own utilities read these, .text-primary and friends */
+  --bs-primary: var(--accent-strong);
+  --bs-primary-rgb: 169, 100, 23;
+  --bs-secondary: var(--teal-strong);
+  --bs-secondary-rgb: 90, 122, 119;
+}
+
+/*=== Buttons. Each variant hardcodes its own colours, so each is remapped ===*/
+
+/* Driven by --btn-* so each theme picks its own. Light gets pale peach with
+   soft text, dark gets the deeper orange with white */
+.btn-primary,
+.btn-success,
+.btn-warning {
+  --bs-btn-color: var(--btn-text);
+  --bs-btn-bg: var(--btn-bg);
+  --bs-btn-border-color: var(--btn-bg);
+  --bs-btn-hover-color: var(--btn-text);
+  --bs-btn-hover-bg: var(--btn-bg-hover);
+  --bs-btn-hover-border-color: var(--btn-bg-hover);
+  --bs-btn-active-color: var(--btn-text);
+  --bs-btn-active-bg: var(--btn-bg-active);
+  --bs-btn-active-border-color: var(--btn-bg-active);
+  --bs-btn-disabled-color: var(--btn-text);
+  --bs-btn-disabled-bg: var(--btn-bg);
+  --bs-btn-disabled-border-color: var(--btn-bg);
+  --bs-btn-focus-shadow-rgb: var(--accent-fill-rgb);
+}
+
+/* Every button gets a little lift, and presses down rather than just changing
+   colour. Bootstrap ships an inset shadow on active which fights this */
+.btn {
+  box-shadow: var(--shadow-btn);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.btn:hover {
+  box-shadow: var(--shadow-btn-hover);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  --bs-btn-active-shadow: none;
+  box-shadow: var(--shadow-btn-active);
+  transform: translateY(1px);
+}
+
+/*=== Night workspace, the dark theme. Same room after dark ===*/
+[data-bs-theme='dark'] {
+  --bg: #151310;
+  --surface: #211d18;
+  --surface-2: #2e271f;
+  --line: #3b332a;
+  --line-strong: #4a4034;
+
+  --accent: #d99432; /* the desk lamp */
+  --accent-hover: #e3a44b;
+  --accent-active: #c9862a;
+  --accent-strong: #e0a44d; /* links, needs to lift off a dark card */
+
+  --teal: #7b9b98;
+  --teal-strong: #9ab8b5; /* lighter here, dark backgrounds need the reverse */
+
+  --text: #f3ebdd;
+  --text-muted: #9d9386;
+  --on-accent: #151310; /* 7.27 on amber */
+  --on-fill: #fffdf8;
+
+  /* Same deeper orange in both themes, it takes white either way */
+  --accent-fill: #a85a14;
+  --accent-fill-rgb: 168, 90, 20;
+  --accent-fill-hover: #b25e12;
+
+  /* Dark mode buttons are the deeper orange with white, not amber with black.
+     White on amber is 2.15, so the fill has to darken for white to work */
+  --btn-bg: var(--accent-fill);
+  --btn-bg-hover: var(--accent-fill-hover);
+  --btn-bg-active: #9c5312;
+  --btn-text: var(--on-fill);
+
+  --tab-inactive: var(--text-muted);
+
+  --danger: #e8705f; /* lighter, a dark background needs the reverse */
+  --danger-fill: #c0453a;
+  --danger-fill-rgb: 192, 69, 58;
+
+  /* Dark separates surfaces by lifting them, so depth is a glow rather than a
+     drop shadow. The amber is what makes it feel like a lamp is on */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md:
+    0 0 26px rgba(217, 148, 50, 0.16), 0 10px 30px rgba(0, 0, 0, 0.55);
+
+  --shadow-btn: 0 1px 2px rgba(0, 0, 0, 0.6), 0 3px 10px rgba(0, 0, 0, 0.45);
+  --shadow-btn-hover:
+    0 0 18px rgba(217, 148, 50, 0.25), 0 8px 22px rgba(0, 0, 0, 0.55);
+  --shadow-btn-active: 0 1px 1px rgba(0, 0, 0, 0.7);
+  --shadow-btn-subtle: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-btn-subtle-hover: 0 2px 6px rgba(0, 0, 0, 0.45);
+
+  /* Restated rather than inherited, so bootstrap's own dark values cannot win */
+  --bs-body-bg: var(--bg);
+  --bs-body-color: var(--text);
+  --bs-emphasis-color: var(--text);
+  --bs-heading-color: var(--text);
+  --bs-secondary-color: var(--text-muted);
+  --bs-secondary-bg: var(--surface-2);
+  --bs-tertiary-bg: var(--surface-2);
+  --bs-border-color: var(--line);
+  --bs-card-bg: var(--surface);
+  --bs-card-border-color: var(--line-strong);
+  /* Dark keeps inputs at the page tone, they recede correctly there already */
+  --input-bg: var(--bg);
+  --bs-form-control-bg: var(--input-bg);
+  --bs-link-color: var(--accent-strong);
+  --bs-link-hover-color: var(--text);
+}
+
+/* Translucent surfaces, so the background glow shows faintly through */
+[data-bs-theme='dark'] .card,
+[data-bs-theme='dark'] .app-navbar {
+  background-color: rgba(33, 29, 24, 0.72);
+  backdrop-filter: blur(12px);
+}
+
+[data-bs-theme='dark'] body {
+  background:
+    radial-gradient(
+      1000px 520px at 12% -10%,
+      rgba(217, 148, 50, 0.15),
+      transparent 62%
+    ),
+    radial-gradient(
+      820px 460px at 100% 4%,
+      rgba(123, 155, 152, 0.08),
+      transparent 58%
+    ),
+    var(--bg);
+}
+
+/* Swapping palettes would animate every transition at once and read as a
+   flash, so they are switched off for the moment of the swap */
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+
+/*=== Header. A shade darker than the page rather than a black slab ===*/
+.app-navbar {
+  background-color: var(--surface-2);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+}
+
+.app-brand {
+  color: var(--text);
+  font-size: 1.25rem;
+}
+
+.app-brand-icon {
+  color: var(--accent-strong);
+  font-size: 1.35rem;
+}
+
+/* Pills rather than plain links, so they read as somewhere to go and are
+   comfortably big enough to hit */
+.app-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.6rem;
+  border: 1px solid transparent;
+}
+
+.app-nav-link:hover,
+.app-nav-link:active {
+  color: var(--text);
+  background-color: var(--surface);
+}
+
+.app-nav-link.active {
+  color: var(--accent-strong);
+  background-color: var(--surface);
+  border-color: var(--line);
+}
+
+.app-user-chip {
+  align-items: center;
+  gap: 0.45rem;
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.95rem;
+  color: var(--text);
+  /* It is a label, not something you highlight and copy */
+  user-select: none;
+}
+
+.app-icon-btn {
+  --bs-btn-color: var(--text-muted);
+  --bs-btn-bg: var(--surface);
+  --bs-btn-border-color: var(--line);
+  --bs-btn-hover-color: var(--text);
+  --bs-btn-hover-bg: var(--bg);
+  --bs-btn-hover-border-color: var(--accent);
+  --bs-btn-active-color: var(--text);
+  --bs-btn-active-bg: var(--bg);
+  --bs-btn-active-border-color: var(--accent-strong);
+  border-radius: 999px;
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 1.05rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Utility buttons take the lighter shadow. The full one made them shout */
+.app-icon-btn,
+.app-logout-btn,
+.input-group .btn-outline-secondary {
+  box-shadow: var(--shadow-btn-subtle);
+}
+
+.app-icon-btn:hover,
+.app-logout-btn:hover,
+.input-group .btn-outline-secondary:hover {
+  box-shadow: var(--shadow-btn-subtle-hover);
+}
+
+/* A real button with a word on it, not a mystery icon */
+.app-logout-btn {
+  --bs-btn-color: var(--text);
+  --bs-btn-bg: var(--surface);
+  --bs-btn-border-color: var(--line);
+  --bs-btn-hover-color: var(--on-fill);
+  --bs-btn-hover-bg: var(--danger-fill);
+  --bs-btn-hover-border-color: var(--danger-fill);
+  --bs-btn-active-color: var(--on-fill);
+  --bs-btn-active-bg: var(--danger-fill);
+  --bs-btn-active-border-color: var(--danger-fill);
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.9rem;
+  font-weight: 600;
+}
+
+.app-header-cta {
+  padding: 0.45rem 1.1rem;
+  font-weight: 600;
+}
+
+/* Between bootstrap's default and btn-lg. The border and weight do the work of
+   looking like the main action, rather than sheer size */
+.app-add-btn {
+  padding: 0.55rem 1.15rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.6rem;
+  border-width: 2px;
+  border-color: transparent;
+}
+
+/* An outline appears on hover so it reads as a target, not just a colour swap */
+.app-add-btn:hover,
+.app-add-btn:active {
+  border-color: var(--accent-strong);
+}
+
+/*=== Demo prompt. No panel behind it, just a divider. A pale button on a pale
+      surface was always going to blend, every tone tried sat within 1.6 of the
+      background. Solid orange on the card is unambiguous instead ===*/
+.app-demo-prompt {
+  border-top: 1px solid var(--line);
+  padding-top: 0.9rem;
+}
+
+/*=== Filter tabs. The inactive state was a pale peach and disappeared ===*/
+.nav-tabs {
+  --bs-nav-tabs-border-color: var(--line);
+  --bs-nav-tabs-link-active-bg: var(--surface);
+  --bs-nav-tabs-link-active-color: var(--accent-strong);
+  --bs-nav-tabs-link-active-border-color: var(--line) var(--line) var(--surface);
+  --bs-nav-link-color: var(--tab-inactive);
+  --bs-nav-link-hover-color: var(--text);
+  font-weight: 600;
+}
+
+/*=== Small buttons that should not shout. The demo prompt and the password
+      reveal were teal outlines and looked like a third accent ===*/
+.btn-outline-secondary {
+  --bs-btn-color: var(--text-muted);
+  --bs-btn-border-color: var(--line);
+  --bs-btn-bg: var(--surface);
+  --bs-btn-hover-color: var(--text);
+  --bs-btn-hover-bg: var(--surface-2);
+  --bs-btn-hover-border-color: var(--accent-strong);
+  --bs-btn-active-color: var(--text);
+  --bs-btn-active-bg: var(--surface-2);
+  --bs-btn-active-border-color: var(--accent-strong);
+  --bs-btn-focus-shadow-rgb: var(--accent-fill-rgb);
+}
+
+/*=== Task row actions. Full height, divided off from the title ===*/
+.task-action {
+  border-left: 1px solid var(--line);
+}
+
+.task-action-edit {
+  color: var(--accent-strong);
+}
+
+/* Slightly translucent so the card shows through and the fill has some depth
+   rather than being a flat block */
+/* The lightest orange that still carries white text. Anything lighter fails
+   with white AND fails with dark, there is no readable middle */
+.task-action-edit:hover,
+.task-action-edit:active {
+  background-color: rgba(178, 94, 18, 0.94);
+  color: var(--on-fill);
+}
+
+.task-action-delete {
+  color: var(--danger);
+}
+
+.task-action-delete:hover,
+.task-action-delete:active {
+  background-color: rgba(var(--danger-fill-rgb), 0.92);
+  color: var(--on-fill);
+}
+
+/*=== Background. Two very soft washes so the page is not a flat block of
+      cream. Fixed so they do not slide around as you scroll ===*/
+body {
+  background:
+    radial-gradient(
+      1100px 550px at 12% -12%,
+      rgba(217, 160, 94, 0.16),
+      transparent 62%
+    ),
+    radial-gradient(
+      900px 500px at 100% 4%,
+      rgba(123, 155, 152, 0.13),
+      transparent 58%
+    ),
+    /* A darker warmth settling along the bottom, kept low so it grounds the
+       page without dimming the content */
+    linear-gradient(
+        to top,
+        rgba(62, 57, 51, 0.13) 0%,
+        rgba(62, 57, 51, 0.05) 9%,
+        transparent 22%
+      ),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/*=== Cards get the soft shadow rather than bootstrap's flat border ===*/
+.card {
+  box-shadow: var(--shadow-sm);
+}
+
+/*=== Alerts. Only the ones the app actually uses ===*/
+.alert-secondary {
+  --bs-alert-bg: var(--surface-2);
+  --bs-alert-border-color: var(--line);
+  --bs-alert-color: var(--text);
+}
+
+.alert-info {
+  --bs-alert-bg: #e6eeed;
+  --bs-alert-border-color: #cfdedc;
+  --bs-alert-color: #2f4442;
+}
+
+/*=== Form controls. Recessed against the card, edged so they still read ===*/
+.form-control,
+.input-group-text {
+  background-color: var(--bs-form-control-bg);
+  border-color: var(--line-strong);
+}
+
+.form-control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.25rem rgba(217, 160, 94, 0.25);
+}
+
+.form-check-input:checked {
+  background-color: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+
+.form-check-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.25rem rgba(217, 160, 94, 0.25);
+}

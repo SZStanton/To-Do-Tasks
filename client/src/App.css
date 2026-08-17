@@ -7,19 +7,13 @@
   min-height: calc(100vh - 70px);
 }
 
-/*=== Navbar ===*/
+/*=== Navbar. Colour lives in theme.css, this is shape only ===*/
 .app-navbar {
   min-height: 60px;
 }
 
 .app-brand {
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-.app-user {
-  font-size: 0.9rem;
-  opacity: 0.85;
+  letter-spacing: 0.2px;
 }
 
 /*=== Task Form ===*/
@@ -40,29 +34,65 @@
   transition:
     transform 0.15s ease,
     box-shadow 0.15s ease;
-  border-left: 4px solid var(--bs-primary);
+  border-left: 4px solid var(--accent);
   /* Spacing lives on the tokens rather than bootstrap's mb-2 and py-3, so it
      can be tuned from one place */
   margin-bottom: var(--task-gap);
+  overflow: hidden;
 }
 
-.task-card .card-body {
+/* stretch so the action buttons can run the full height of the card */
+.task-row {
+  display: flex;
+  align-items: stretch;
+  min-height: 3.5rem;
+}
+
+.task-main {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-grow: 1;
   padding: var(--card-padding);
+  min-width: 0;
+}
+
+.task-actions {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.task-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0 1.1rem;
+  background: none;
+  border: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
 }
 
 .task-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
 /* A touchscreen fires active on press, so hover alone gives mobile nothing */
 .task-card:active {
   transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: var(--shadow-sm) !important;
 }
 
+/* Teal marks completion, so finished tasks step back from the caramel ones
+   without just fading out */
 .task-card.task-done {
-  border-left-color: var(--bs-secondary);
+  border-left-color: var(--teal);
   opacity: 0.75;
 }
 
@@ -72,9 +102,16 @@
   cursor: pointer;
 }
 
+/* The padding grows the clickable box out into the card's own padding, and the
+   matching negative margin cancels it again, so the card does not get taller.
+   Hit area covers the full row height, layout is unchanged */
 .task-title {
   cursor: pointer;
-  margin-bottom: 0;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  padding: var(--card-padding) 0;
+  margin: calc(var(--card-padding) * -1) 0;
   /* Clicking toggles the task, so a double click selecting the words is just
      in the way. The edit page is where you actually work with the text */
   user-select: none;
