@@ -44,11 +44,12 @@ function TaskCard({ task, onDelete, onToggle }) {
             <i className="bi bi-pencil" aria-hidden="true" />
             <span>Edit</span>
           </Link>
+          {/* No confirmation, it goes to the bin and can be put back */}
           <button
             type="button"
             className="task-action task-action-delete"
             onClick={() => onDelete(task.id)}
-            title="Delete task"
+            title="Move to the bin"
           >
             <i className="bi bi-trash3" aria-hidden="true" />
             <span>Delete</span>

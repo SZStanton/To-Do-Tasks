@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AddTask from './pages/AddTask';
 import EditTask from './pages/EditTask';
+import Bin from './pages/Bin';
 
 // Components
 import Header from './components/Header';
@@ -59,6 +60,15 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EditTask />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/bin"
+              element={
+                <ProtectedRoute>
+                  <Bin />
                 </ProtectedRoute>
               }
             />

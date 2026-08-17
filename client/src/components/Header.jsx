@@ -121,6 +121,12 @@ function Header() {
                     Add Task
                   </NavLink>
                 </li>
+                <li className="nav-item">
+                  <NavLink className={navClass} to="/bin" onClick={closeMenu}>
+                    <i className="bi bi-trash3" aria-hidden="true" />
+                    Bin
+                  </NavLink>
+                </li>
               </>
             ) : (
               <li className="nav-item">

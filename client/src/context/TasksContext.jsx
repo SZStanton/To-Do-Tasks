@@ -170,6 +170,107 @@ function TasksProvider({ children }) {
     [token, tasks],
   );
 
+  //=== THE BIN ===
+  // Fetched on demand rather than kept in sync, nobody sits watching the bin
+  const [bin, setBin] = useState([]);
+  const [binLoading, setBinLoading] = useState(false);
+
+  const authHeaders = useCallback(
+    () => ({ Authorization: `Bearer ${token}` }),
+    [token],
+  );
+
+  const fetchBin = useCallback(async () => {
+    if (!token) return;
+    setBinLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/tasks/bin`, {
+        headers: authHeaders(),
+      });
+      const data = await response.json();
+      setBin(response.ok ? data : []);
+    } catch {
+      setBin([]);
+    } finally {
+      setBinLoading(false);
+    }
+  }, [token, authHeaders]);
+
+  const restoreTask = useCallback(
+    async id => {
+      const snapshot = bin;
+      setBin(prev => prev.filter(task => task.id !== id));
+
+      try {
+        const response = await fetch(`${API_URL}/api/tasks/${id}/restore`, {
+          method: 'PUT',
+          headers: authHeaders(),
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          setBin(snapshot);
+          return { success: false, message: data.message };
+        }
+
+        // Straight back into the list, no refetch needed
+        setTasks(prev => [data, ...prev]);
+        return { success: true };
+      } catch {
+        setBin(snapshot);
+        return { success: false, message: 'Could not restore the task.' };
+      }
+    },
+    [bin, authHeaders],
+  );
+
+  const deleteForever = useCallback(
+    async id => {
+      const snapshot = bin;
+      setBin(prev => prev.filter(task => task.id !== id));
+
+      try {
+        const response = await fetch(`${API_URL}/api/tasks/${id}/permanent`, {
+          method: 'DELETE',
+          headers: authHeaders(),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          setBin(snapshot);
+          return { success: false, message: data.message };
+        }
+        return { success: true };
+      } catch {
+        setBin(snapshot);
+        return { success: false, message: 'Could not delete the task.' };
+      }
+    },
+    [bin, authHeaders],
+  );
+
+  const emptyBin = useCallback(async () => {
+    const snapshot = bin;
+    setBin([]);
+
+    try {
+      const response = await fetch(`${API_URL}/api/tasks/bin`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        setBin(snapshot);
+        return { success: false, message: data.message };
+      }
+      return { success: true };
+    } catch {
+      setBin(snapshot);
+      return { success: false, message: 'Could not empty the bin.' };
+    }
+  }, [bin, authHeaders]);
+
   //=== GET SINGLE TASK ===
   const getTask = useCallback(
     id => tasks.find(task => task.id === id),
@@ -179,8 +280,36 @@ function TasksProvider({ children }) {
   //=== CONTEXT VALUES ===
   // Memorized context values
   const value = useMemo(
-    () => ({ tasks, loading, error, addTask, updateTask, deleteTask, getTask }),
-    [tasks, loading, error, addTask, updateTask, deleteTask, getTask],
+    () => ({
+      tasks,
+      loading,
+      error,
+      addTask,
+      updateTask,
+      deleteTask,
+      getTask,
+      bin,
+      binLoading,
+      fetchBin,
+      restoreTask,
+      deleteForever,
+      emptyBin,
+    }),
+    [
+      tasks,
+      loading,
+      error,
+      addTask,
+      updateTask,
+      deleteTask,
+      getTask,
+      bin,
+      binLoading,
+      fetchBin,
+      restoreTask,
+      deleteForever,
+      emptyBin,
+    ],
   );
 
   // Provide tasks data to the app

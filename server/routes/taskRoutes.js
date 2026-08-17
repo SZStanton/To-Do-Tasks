@@ -4,6 +4,7 @@ import protect from '../middleware/auth.js';
 import validEmail from '../middleware/validEmail.js';
 import jsonOnly from '../middleware/jsonOnly.js';
 import taskLength from '../middleware/taskLength.js';
+import { binExpiry } from '../config/retention.js';
 
 const router = Router();
 
@@ -21,24 +22,48 @@ const toTask = task => ({
   completed: task.completed,
   createdAt: task.createdAt,
   updatedAt: task.updatedAt,
+  deletedAt: task.deletedAt,
 });
+
+// Live tasks only. Everything binned is filtered out unless asked for by name
+const live = req => ({ user: req.user.id, deletedAt: null });
+const binned = req => ({ user: req.user.id, deletedAt: { $ne: null } });
 
 //== GET ALL TASKS ==
 router.get('/', async (req, res) => {
   try {
-    const tasks = await Task.find({ user: req.user.id }).sort({
-      createdAt: -1,
-    });
+    const tasks = await Task.find(live(req)).sort({ createdAt: -1 });
     res.json(tasks.map(toTask));
   } catch {
     res.status(500).json({ message: 'Could not fetch tasks.' });
   }
 });
 
+//== GET THE BIN ==
+// Must sit above /:id or express reads "bin" as an id
+router.get('/bin', async (req, res) => {
+  try {
+    const tasks = await Task.find(binned(req)).sort({ deletedAt: -1 });
+    res.json(tasks.map(toTask));
+  } catch {
+    res.status(500).json({ message: 'Could not fetch the bin.' });
+  }
+});
+
+//== EMPTY THE BIN ==
+router.delete('/bin', async (req, res) => {
+  try {
+    const { deletedCount } = await Task.deleteMany(binned(req));
+    res.json({ message: 'Bin emptied.', deletedCount });
+  } catch {
+    res.status(500).json({ message: 'Could not empty the bin.' });
+  }
+});
+
 //== GET ONE TASK ==
 router.get('/:id', async (req, res) => {
   try {
-    const task = await Task.findOne({ _id: req.params.id, user: req.user.id });
+    const task = await Task.findOne({ _id: req.params.id, ...live(req) });
     if (!task) return res.status(404).json({ message: 'Task not found.' });
     res.json(toTask(task));
   } catch {
@@ -88,7 +113,7 @@ router.put('/:id', jsonOnly, taskLength, async (req, res) => {
     }
 
     const task = await Task.findOneAndUpdate(
-      { _id: req.params.id, user: req.user.id },
+      { _id: req.params.id, ...live(req) },
       update,
       { returnDocument: 'after' },
     );
@@ -101,19 +126,57 @@ router.put('/:id', jsonOnly, taskLength, async (req, res) => {
   }
 });
 
-//== DELETE TASK ==
+//== PUT A TASK BACK ==
+router.put('/:id/restore', async (req, res) => {
+  try {
+    const task = await Task.findOneAndUpdate(
+      { _id: req.params.id, ...binned(req) },
+      // Back onto the account's own clock, off the 24 hour one. Null rather
+      // than undefined, or mongoose strips it and the demo account's restored
+      // tasks keep the 24 hour expiry and quietly disappear
+      { deletedAt: null, expiresAt: req.user.expiresAt ?? null },
+      { returnDocument: 'after' },
+    );
+
+    if (!task) return res.status(404).json({ message: 'Task not in the bin.' });
+
+    res.json(toTask(task));
+  } catch {
+    res.status(500).json({ message: 'Could not restore the task.' });
+  }
+});
+
+//== MOVE A TASK TO THE BIN ==
+// Not a real delete. The TTL index clears it 24 hours later
 router.delete('/:id', async (req, res) => {
   try {
-    const task = await Task.findOneAndDelete({
-      _id: req.params.id,
-      user: req.user.id,
-    });
+    const task = await Task.findOneAndUpdate(
+      { _id: req.params.id, ...live(req) },
+      { deletedAt: new Date(), expiresAt: binExpiry() },
+      { returnDocument: 'after' },
+    );
 
     if (!task) return res.status(404).json({ message: 'Task not found.' });
 
-    res.json({ message: 'Task deleted successfully.' });
+    res.json(toTask(task));
   } catch {
     res.status(500).json({ message: 'Could not delete task.' });
+  }
+});
+
+//== DELETE FOR GOOD ==
+router.delete('/:id/permanent', async (req, res) => {
+  try {
+    const task = await Task.findOneAndDelete({
+      _id: req.params.id,
+      ...binned(req),
+    });
+
+    if (!task) return res.status(404).json({ message: 'Task not in the bin.' });
+
+    res.json({ message: 'Task deleted permanently.' });
+  } catch {
+    res.status(500).json({ message: 'Could not delete the task.' });
   }
 });
 
