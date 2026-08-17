@@ -29,6 +29,7 @@ A full-stack MERN task management application featuring secure user authenticati
 - Secure user registration and login with hashed password validation
 - JWT authentication and protected API routes
 - Create, edit, complete, and delete tasks
+- Drag to reorder, with keyboard support through the grip handle
 - Deleted tasks go to a bin, restorable for 24 hours before they clear themselves
 - Light and dark themes, remembered between visits
 - Filter tasks by All / Active / Completed

@@ -15,7 +15,11 @@ const DEMO_TASKS = [
 // No expiresAt on these, the demo is never swept up by the retention TTL
 async function resetDemoTasks(userId) {
   await Task.deleteMany({ user: userId });
-  await Task.insertMany(DEMO_TASKS.map(task => ({ ...task, user: userId })));
+  // Explicit order, they are inserted in the same millisecond so createdAt
+  // cannot be relied on to break the tie
+  await Task.insertMany(
+    DEMO_TASKS.map((task, order) => ({ ...task, user: userId, order })),
+  );
 }
 
 export { DEMO_TASKS, resetDemoTasks };

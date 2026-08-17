@@ -434,6 +434,27 @@
   color: var(--on-fill);
 }
 
+/*=== Drag to reorder ===*/
+.task-grip {
+  color: var(--text-muted);
+}
+
+.task-grip:hover,
+.task-grip:focus-visible {
+  color: var(--accent-strong);
+}
+
+/* Lifted and semi transparent while it is under the cursor.
+   transition is killed here on purpose: the card's own 0.15s transform
+   transition would animate every pointer move and feel like lag */
+.task-card.is-dragging {
+  transition: none !important;
+  will-change: transform;
+  box-shadow: var(--shadow-md);
+  opacity: 0.9;
+  z-index: 2;
+}
+
 /*=== Bin ===*/
 .task-action-restore {
   color: var(--teal-strong);

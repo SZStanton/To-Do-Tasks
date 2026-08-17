@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import mongoose from 'mongoose';
 import Task from '../models/Task.js';
 import protect from '../middleware/auth.js';
 import validEmail from '../middleware/validEmail.js';
@@ -23,7 +24,12 @@ const toTask = task => ({
   createdAt: task.createdAt,
   updatedAt: task.updatedAt,
   deletedAt: task.deletedAt,
+  order: task.order,
 });
+
+// Lowest order first. createdAt breaks ties, so before anything has been
+// dragged the list still reads newest first
+const LIST_ORDER = { order: 1, createdAt: -1 };
 
 // Live tasks only. Everything binned is filtered out unless asked for by name
 const live = req => ({ user: req.user.id, deletedAt: null });
@@ -32,7 +38,7 @@ const binned = req => ({ user: req.user.id, deletedAt: { $ne: null } });
 //== GET ALL TASKS ==
 router.get('/', async (req, res) => {
   try {
-    const tasks = await Task.find(live(req)).sort({ createdAt: -1 });
+    const tasks = await Task.find(live(req)).sort(LIST_ORDER);
     res.json(tasks.map(toTask));
   } catch {
     res.status(500).json({ message: 'Could not fetch tasks.' });
@@ -57,6 +63,37 @@ router.delete('/bin', async (req, res) => {
     res.json({ message: 'Bin emptied.', deletedCount });
   } catch {
     res.status(500).json({ message: 'Could not empty the bin.' });
+  }
+});
+
+//== REORDER ==
+// Takes the whole list of ids in their new order and rewrites the positions.
+// Above /:id, and it only ever touches ids that belong to this user
+router.put('/reorder', jsonOnly, async (req, res) => {
+  try {
+    const { ids } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: 'An array of ids is required.' });
+    }
+
+    if (!ids.every(id => mongoose.isValidObjectId(id))) {
+      return res.status(400).json({ message: 'One of the ids is not valid.' });
+    }
+
+    await Task.bulkWrite(
+      ids.map((id, index) => ({
+        updateOne: {
+          filter: { _id: id, ...live(req) },
+          update: { order: index },
+        },
+      })),
+    );
+
+    const tasks = await Task.find(live(req)).sort(LIST_ORDER);
+    res.json(tasks.map(toTask));
+  } catch {
+    res.status(500).json({ message: 'Could not reorder the tasks.' });
   }
 });
 
