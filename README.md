@@ -9,6 +9,9 @@ The login page has a one click demo sign in, so you can look around without
 creating an account. The API is on a free tier that sleeps when idle, so the
 first load can take up to a minute while it wakes.
 
+If you do create an account, it and its tasks are deleted after 60 days of
+inactivity. Nothing personal is kept indefinitely.
+
 ## Screenshots
 
 <table>
@@ -108,4 +111,3 @@ npm test
 - Sharing one set of validation rules between client and server, with tests that
   fail if the two ever disagree
 - Deploying a full stack application across Vercel, Render and Atlas
-
