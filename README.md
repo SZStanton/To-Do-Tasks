@@ -56,28 +56,6 @@ first load can take up to a minute while it wakes.
 | Testing    | Vitest, Testing Library                |
 | Deployment | Vercel, Render                         |
 
-## API
-
-Task routes require a `Bearer` token. Deleting is a soft delete, so a task moves
-to the bin rather than being destroyed.
-
-| Method   | Endpoint                   | Body                              |
-| -------- | -------------------------- | --------------------------------- |
-| `POST`   | `/api/auth/register`       | `name, email, username, password` |
-| `POST`   | `/api/auth/login`          | `identifier, password`            |
-| `GET`    | `/api/auth/me`             |                                   |
-| `GET`    | `/api/tasks`               |                                   |
-| `POST`   | `/api/tasks`               | `title`                           |
-| `PUT`    | `/api/tasks/:id`           | `title` and/or `completed`        |
-| `DELETE` | `/api/tasks/:id`           | moves it to the bin               |
-| `PUT`    | `/api/tasks/reorder`       | `ids`, the list in its new order  |
-| `GET`    | `/api/tasks/bin`           |                                   |
-| `PUT`    | `/api/tasks/:id/restore`   |                                   |
-| `DELETE` | `/api/tasks/:id/permanent` |                                   |
-| `DELETE` | `/api/tasks/bin`           | empties the bin                   |
-
-`identifier` accepts either the username or the email.
-
 ## Getting Started
 
 Requires Node 24 and a MongoDB Atlas cluster.
